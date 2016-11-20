@@ -26,7 +26,7 @@ updateReleaseVersionsAndTrigger () {
   RELEASE_TRIGGER_BRANCH=release
 
   # use optional release.properties (to retrieve Git user config and to override arguments default values)
-  [ -f release.properties ] || . release.properties
+  [ -f release.properties ] && . release.properties
 
   # use arguments if they exist
   if [ "$#" -lt 2 ]; then
