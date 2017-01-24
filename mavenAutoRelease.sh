@@ -40,5 +40,31 @@ updateVersions () {
   fi
 
   echo "Updating $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release branch is $RELEASE_BRANCH"
+
+  # 1. clone the repository to a temporary directory
+  TEMP_CLONE_DIRECTORY=$(mktemp -d)
+  git clone $GIT_REPOSITORY_URL $TEMP_CLONE_DIRECTORY
+  cd $TEMP_CLONE_DIRECTORY
+
+  # 2. checkout the source branch
+  git checkout $SOURCE_BRANCH
+
+  # 3. retrieve the next versions
+  RELEASE_VERSION=$(mvn -q -N build-helper:parse-version -Dexec.executable="echo" -Dexec.args='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}' exec:exec)
+  DEV_VERSION=$(mvn -q -N build-helper:parse-version -Dexec.executable="echo" -Dexec.args='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}-${parsedVersion.qualifier}' exec:exec)
+
+  # 4. checkout the release branch
+  git checkout $RELEASE_BRANCH
+
+  # 5. update the release properties file with new versions
+  sed -i "s/\(RELEASE_VERSION=\).*\$/\1${RELEASE_VERSION}/" release.properties
+  sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" release.properties
+
+  # 6. trigger the release by pushing the new file
+  git add release.properties && git commit -m "Triggering release"
+  #git push origin release
+
+  cd $OLDPWD
+
   return 0
 } 
