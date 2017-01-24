@@ -13,7 +13,7 @@
 updateVersions () {
   if [ "$#" -lt 1 ]; then
     echo "${FUNCNAME}(): at least a Git repository URL is required" >&2
-    exit 1
+    return 1
   fi
   GIT_REPOSITORY_URL=$1
   # default values
@@ -43,28 +43,43 @@ updateVersions () {
 
   # 1. clone the repository to a temporary directory
   TEMP_CLONE_DIRECTORY=$(mktemp -d)
-  git clone $GIT_REPOSITORY_URL $TEMP_CLONE_DIRECTORY
+  echo "Cloning the repository at $GIT_REPOSITORY_URL to $TEMP_CLONE_DIRECTORY"
+  git clone -q $GIT_REPOSITORY_URL $TEMP_CLONE_DIRECTORY
   cd $TEMP_CLONE_DIRECTORY
 
   # 2. checkout the source branch
-  git checkout $SOURCE_BRANCH
+  echo "Checking out the source branch: $SOURCE_BRANCH"
+  git checkout -q $SOURCE_BRANCH
 
   # 3. retrieve the next versions
+  echo "Retrieving the next versions"
   RELEASE_VERSION=$(mvn -q -N build-helper:parse-version -Dexec.executable="echo" -Dexec.args='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}' exec:exec)
   DEV_VERSION=$(mvn -q -N build-helper:parse-version -Dexec.executable="echo" -Dexec.args='${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.nextIncrementalVersion}-${parsedVersion.qualifier}' exec:exec)
+  echo "New versions are: RELEASE_VERSION=$RELEASE_VERSION and DEV_VERSION=$DEV_VERSION"
 
   # 4. checkout the release branch
+  echo "Checking out the release branch: $SOURCE_BRANCH"
   git checkout $RELEASE_BRANCH
 
   # 5. update the release properties file with new versions
+  echo "Updating the versions in release.properties"
   sed -i "s/\(RELEASE_VERSION=\).*\$/\1${RELEASE_VERSION}/" release.properties
   sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" release.properties
 
-  # 6. trigger the release by pushing the new file
-  git add release.properties && git commit -m "Triggering release"
-  #git push origin release
+  # use properties (especially for Git user config)
+  . release.properties
 
+  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
+  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
+
+  # 6. trigger the release by pushing the new file
+  echo "Triggering the release"
+  git add release.properties && git commit -m "Triggering release"
+  git push origin release
+
+  # clean up and restore initial directory
   cd $OLDPWD
+  rm -rf $TEMP_CLONE_DIRECTORY
 
   return 0
-} 
+}
