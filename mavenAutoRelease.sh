@@ -39,6 +39,6 @@ updateVersions () {
     echo "${FUNCNAME}(): using '$RELEASE_BRANCH' as release branch"
   fi
 
-  echo "Updating $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release branch is $RELEASE_BRANCH
+  echo "Updating $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release branch is $RELEASE_BRANCH"
   return 0
 } 
