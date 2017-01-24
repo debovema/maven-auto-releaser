@@ -26,7 +26,7 @@ updateReleaseVersionsAndTrigger () {
   RELEASE_TRIGGER_BRANCH=release
 
   # use optional release.properties (to retrieve Git user config and to override arguments default values)
-  [ ! -f release.properties ] || . release.properties
+  [ ! -f release.properties ] || . ./release.properties
 
   # use arguments if they exist
   if [ "$#" -lt 2 ]; then
@@ -64,7 +64,7 @@ updateReleaseVersionsAndTrigger () {
 
   # use optional release.properties (to retrieve Git user config and to override arguments default values)
   # this is not the same one as previous one but the one from the repository
-  [ ! -f release.properties ] || . release.properties
+  [ ! -f release.properties ] || . ./release.properties
 
   # 2. checkout the source branch
   echo "Checking out the source branch: $SOURCE_BRANCH"
