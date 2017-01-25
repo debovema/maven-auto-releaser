@@ -193,7 +193,7 @@ updateReleaseVersionsAndTrigger () {
     fi
   else
     echo " Pushing to the release trigger branch";
-    git push origin release
+    git push origin release -q
   fi
 
   # clean up and restore initial directory
