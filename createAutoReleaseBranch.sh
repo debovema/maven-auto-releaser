@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 GIT_REPOSITORY_URL=$1
 
@@ -9,7 +9,7 @@ echo "1. Cloning the repository at $GIT_REPOSITORY_URL to $TEMP_CLONE_DIRECTORY"
 git clone -q $GIT_REPOSITORY_URL $TEMP_CLONE_DIRECTORY
 if [ $? -gt 0 ]; then
   echo " Unable to clone $GIT_REPOSITORY_URL"
-  return 1
+  exit 1
 fi
 
 cd $TEMP_CLONE_DIRECTORY
