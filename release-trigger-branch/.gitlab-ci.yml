@@ -9,4 +9,4 @@ release:
     script:
         - mvn -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION -Dmessage="[maven-release-plugin] [ci skip] Updating parent version" release:clean versions:update-parent scm:checkin release:prepare release:perform $MAVEN_RELEASE_ADDITIONAL_ARGS
     only:
-        - $MAVEN_AUTO_RELEASE_TRIGGER_BRANCH
+        - $RELEASE_TRIGGER_BRANCH
