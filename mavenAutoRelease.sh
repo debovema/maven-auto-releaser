@@ -342,6 +342,8 @@ parseCommandLine () {
   fi
 
   eval set -- "$OPTS"
+  NO_BANNER=false
+  NO_COMMAND_LINE_OVERRIDE=false
 
   while true ; do
     case "$1" in
