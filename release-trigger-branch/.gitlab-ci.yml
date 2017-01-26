@@ -1,7 +1,7 @@
 image: debovema/docker-mvn
 
 before_script:
-    - export RELEASE_SH_CHMOD=`stat --format '%a' ./prepareRelease.sh`
+    - export PREPARE_RELEASE_SH_CHMOD=`stat --format '%a' ./prepareRelease.sh`
     - chmod u+x prepareRelease.sh
     - . ./prepareRelease.sh
 
