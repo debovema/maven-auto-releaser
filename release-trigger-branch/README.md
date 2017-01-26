@@ -1,4 +1,4 @@
-# $MAVEN_AUTO_PROJECT_NAME
+# $PROJECT_NAME
 
 ## Release trigger branch
 
@@ -22,7 +22,7 @@ git checkout release
 ```
 
 ### setting manually the versions, without triggering releases for ancestors
-To trigger a new release of $MAVEN_AUTO_PROJECT_NAME, follow these steps:
+To trigger a new release of $PROJECT_NAME, follow these steps:
 
 * checkout this branch (after cloning this repository):
 ```shell
