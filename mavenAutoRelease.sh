@@ -332,9 +332,9 @@ updateReleaseVersions () {
 # common command line parser to convert command line switch to variables
 # this will also set PARAMETERS variable with all command line arguments without switches
 parseCommandLine () {
-  unset OPTS NO_BANNER NO_COMMAND_LINE_OVERRIDE
+  unset OPTS NO_BANNER NO_COMMAND_LINE_OVERRIDE RELEASE_TRIGGER_BRANCH
 
-  OPTS=`getopt -o '' -l no-banner,no-cmd-line-override -- "$@"`
+  OPTS=`getopt -o '' -l no-banner,no-cmd-line-override,release-trigger-branch: -- "$@"`
 
   if [ $? != 0 ]
   then
@@ -347,6 +347,7 @@ parseCommandLine () {
 
   while true ; do
     case "$1" in
+      --release-trigger-branch) RELEASE_TRIGGER_BRANCH=$2; shift 2;;
       --no-banner) NO_BANNER=true; shift;;
       --no-cmd-line-override) NO_COMMAND_LINE_OVERRIDE=true; shift;;
       --) shift; break;;
