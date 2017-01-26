@@ -40,7 +40,7 @@ Currently, only Gitlab CI is supported, though adding other Continuous Integrati
 
 3. create a release trigger branch on the repositories
 
-        . mavenAutoRelease.sh && createReleaseTriggerBranch <URL of the Git repository>
+        . ./mavenAutoRelease.sh && createReleaseTriggerBranch <URL of the Git repository>
 
 4. follow the instructions of the README file created on the release trigger branch of the Git repository
 
