@@ -42,6 +42,8 @@ Currently, only Gitlab CI is supported, though adding other Continuous Integrati
 
         . mavenAutoRelease.sh && createReleaseTriggerBranch <URL of the Git repository>
 
+4. follow the instructions of the README file created on the release trigger branch of the Git repository
+
 ## Licensing
 
 The Maven auto releaser tool is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/debovema/maven-auto-releaser/blob/master/LICENSE) for the full license text.
