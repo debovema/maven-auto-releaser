@@ -35,7 +35,7 @@ Currently, only Gitlab CI is supported, though adding other Continuous Integrati
 git clone https://github.com/debovema/maven-auto-releaser.git ```
 
 2. enter into the directory
-```
+```shell
 shell cd maven-auto-releaser ```
 
 3. create a release trigger branch on the repositories
