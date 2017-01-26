@@ -28,6 +28,21 @@ Currently, only Gitlab CI is supported, though adding other Continuous Integrati
 * The Gitlab CI runner used to execute release jobs must be able to clone and push from and to the repositories of the projects to release (with SSH keys)
 * Only one Gitlab CI runner must be running at a time: either have only one runner or assign all the projects to be released to the same runner
 
+## Getting started
+
+1. clone this repository
+```shell
+git clone https://github.com/debovema/maven-auto-releaser.git
+```
+2. enter into the directory
+```shell
+cd maven-auto-releaser
+```
+3. create a release trigger branch on the repositories
+```shell
+. mavenAutoRelease.sh && createReleaseTriggerBranch <URL of the Git repository>
+```
+
 ## Licensing
 
 The Maven auto releaser tool is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/debovema/maven-auto-releaser/blob/master/LICENSE) for the full license text.
