@@ -360,6 +360,8 @@ parseCommandLine () {
     PARAMETERS="$PARAMETERS $arg"
   done
 
+  PARAMETERS=$(echo $PARAMETERS | xargs)
+
   simpleConsoleLogger "Maven auto releaser v$MAVEN_AUTO_RELEASER_VERSION" $NO_BANNER
   simpleConsoleLogger " https://github.com/debovema/maven-auto-releaser" $NO_BANNER
 }
