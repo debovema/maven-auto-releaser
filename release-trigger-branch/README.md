@@ -1,4 +1,4 @@
-# $PROJECT_NAME
+# $MAVEN_AUTO_PROJECT_NAME
 
 ## Release trigger branch
 
@@ -11,13 +11,18 @@ They will all commit & push a change on this branch which will trigger a build o
 
 ### automatically, with parent projects released before
 
-Simply run:
+* checkout this branch (after cloning this repository):
+```shell
+git checkout release
+```
+
+* simply run:
 ```shell
 ./fullAutoRelease.sh
 ```
 
 ### setting manually the versions, without triggering releases for ancestors
-To trigger a new release of $PROJECT_NAME, follow these steps:
+To trigger a new release of $MAVEN_AUTO_PROJECT_NAME, follow these steps:
 
 * checkout this branch (after cloning this repository):
 ```shell
