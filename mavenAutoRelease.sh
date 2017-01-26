@@ -347,7 +347,7 @@ parseCommandLine () {
 
   while true ; do
     case "$1" in
-      --release-trigger-branch) RELEASE_TRIGGER_BRANCH=$2; shift 2;;
+      --release-trigger-branch) RELEASE_TRIGGER_BRANCH="$2"; shift; shift;;
       --no-banner) NO_BANNER=true; shift;;
       --no-cmd-line-override) NO_COMMAND_LINE_OVERRIDE=true; shift;;
       --) shift; break;;
