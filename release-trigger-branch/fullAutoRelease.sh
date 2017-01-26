@@ -6,4 +6,4 @@ chmod u+x /tmp/mavenAutoRelease.sh
 . /tmp/mavenAutoRelease.sh
 
 # call updateReleaseVersionsAndTrigger from Maven auto release script
-updateReleaseVersionsAndTrigger $MAVEN_AUTO_RELEASE_REPOSITORY_URL
+updateReleaseVersionsAndTrigger $GIT_REPOSITORY_URL
