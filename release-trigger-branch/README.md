@@ -2,7 +2,7 @@
 
 ## Release trigger branch
 
-This branch is a release trigger. It means that **whenever a commit is pushed on this branch**, a release job, defined in *.gitlab-ci.yml file*, will be launched, based on properties set in *release.properties* file.
+This branch is a release trigger. It means that **whenever a commit is pushed on this branch**, a release job, defined in [*.gitlab-ci.yml*](./.gitlab-ci.yml) file, will be launched, based on properties set in [*release.properties*](./release.properties) file.
 
 ## How to trigger a release ?
 
@@ -48,3 +48,7 @@ git add release.properties && git commit -m "Triggering release"
 ```shell
 git push origin release
 ```
+
+## Full documentation
+
+The full documentation for the Maven auto releaser can be found at https://github.com/debovema/maven-auto-releaser
