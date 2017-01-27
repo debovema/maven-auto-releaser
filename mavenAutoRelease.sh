@@ -35,7 +35,7 @@ createReleaseTriggerBranch () {
   getProjectName
 
   # 2. create the release trigger branch (called release by default)
-  echo "2. Create the release trigger branch and adding content"
+  echo "2. Create the release trigger"
   git symbolic-ref HEAD refs/heads/$RELEASE_TRIGGER_BRANCH &&
   git reset
 
@@ -109,7 +109,7 @@ replaceProperties () {
 }
 
 createReleaseTriggerBranch_initCommandLineArguments () {
-  unset GIT_REPOSITORY_URL
+  unset RELEASE_TRIGGER_BRANCH GIT_REPOSITORY_URL GIT_REPOSITORY_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_PARENT_URL
 
   if [ "$#" -lt 1 ]; then
     echo " At least a Git repository URL is required" >&2
@@ -117,9 +117,12 @@ createReleaseTriggerBranch_initCommandLineArguments () {
   fi
 
   GIT_REPOSITORY_URL=$1
+  GIT_REPOSITORY_PARENT_URL=$2
+  GIT_REPOSITORY_PARENT_PARENT_URL=$3
+  GIT_REPOSITORY_PARENT_PARENT_PARENT_URL=$4
 
   # default values
-  [ ! -z $RELEASE_TRIGGER_BRANCH ] || RELEASE_TRIGGER_BRANCH=release
+  [ ! -z $RELEASE_TRIGGER_BRANCH ] || RELEASE_TRIGGER_BRANCH=release-trigger
 }
 
 ### release triggering ###
