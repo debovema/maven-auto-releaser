@@ -46,7 +46,6 @@ createReleaseTriggerBranch () {
     rm -rf $TEMP_CLONE_DIRECTORY/*
   fi
 
-  rm -rf $TEMP_CLONE_DIRECTORY/* &&
   echo "# $RELEASE_TRIGGER_BRANCH" > README.md &&
   git add README.md &&
   git commit -m "Creating $RELEASE_TRIGGER_BRANCH branch"
