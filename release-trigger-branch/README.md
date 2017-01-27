@@ -21,6 +21,8 @@ git checkout release
 ./fullAutoRelease.sh
 ```
 
+This script will update the [*release.properties*](./release.properties) file with next versions then commit and push this file on this release trigger branch, hence triggering a release.
+
 ### setting manually the versions, without triggering releases for ancestors
 To trigger a new release of $PROJECT_NAME, follow these steps:
 
