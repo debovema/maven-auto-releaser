@@ -36,8 +36,16 @@ createReleaseTriggerBranch () {
 
   # 2. create the release trigger branch (called release by default)
   git symbolic-ref HEAD refs/heads/$RELEASE_TRIGGER_BRANCH &&
-  git reset &&
-  (command -v setopt >/dev/null 2>&1 && ([ $? -ne 0 ] || setopt localoptions rmstarsilent)) &&
+  git reset
+
+  command -v setopt >/dev/null 2>&1 # fix for ZSH
+  if [ $? -eq 0 ]; then
+    setopt localoptions rmstarsilent
+    rm -rf $TEMP_CLONE_DIRECTORY/*
+  else
+    rm -rf $TEMP_CLONE_DIRECTORY/*
+  fi
+
   rm -rf $TEMP_CLONE_DIRECTORY/* &&
   echo "# $RELEASE_TRIGGER_BRANCH" > README.md &&
   git add README.md &&
