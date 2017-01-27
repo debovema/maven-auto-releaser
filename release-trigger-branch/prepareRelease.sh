@@ -4,8 +4,6 @@ chmod $PREPARE_RELEASE_SH_CHMOD ./prepareRelease.sh
 
 . release.properties
 
-$MAVEN_RELEASE_ADDITIONAL_ARGS="-gs /home/m2/settings.xml"
-
 # configure repository and checkout $SOURCE_BRANCH instead of current release branch
 git config --global user.name $GIT_USER_NAME
 git config --global user.email $GIT_USER_EMAIL
