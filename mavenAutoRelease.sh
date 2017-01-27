@@ -35,6 +35,7 @@ createReleaseTriggerBranch () {
   getProjectName
 
   # 2. create the release trigger branch (called release by default)
+  echo "2. Create the release trigger branch and adding content"
   git symbolic-ref HEAD refs/heads/$RELEASE_TRIGGER_BRANCH &&
   git reset
 
@@ -48,9 +49,10 @@ createReleaseTriggerBranch () {
 
   echo "# $RELEASE_TRIGGER_BRANCH" > README.md &&
   git add README.md &&
-  git commit -m "Creating $RELEASE_TRIGGER_BRANCH branch"
+  git commit -qm "Creating $RELEASE_TRIGGER_BRANCH branch"
 
   # 3. retrieve files and add them to the release trigger branch
+  echo "3. Adding content to the release trigger branch"
   wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/release-trigger-branch/.gitlab-ci.yml -O ./.gitlab-ci.yml &&
   replaceProperties ./.gitlab-ci.yml &&
   git add ./.gitlab-ci.yml
@@ -67,10 +69,11 @@ createReleaseTriggerBranch () {
   replaceProperties ./release.properties &&
   git add ./release.properties
 
-  git commit -m "Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
+  git commit -qm "Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
 
   # 4. push the release trigger branch
-  git push origin $RELEASE_TRIGGER_BRANCH
+  echo "4. Pushing the created release trigger branch"
+  git push origin $RELEASE_TRIGGER_BRANCH -q
 
   PUSH_BRANCH_RESULT=$?
   if [ $PUSH_BRANCH_RESULT -gt 0 ]; then
@@ -95,7 +98,7 @@ getProjectName () {
   [ $? -eq 0 ] && MAVEN_PROJECT_NAME=$(echo "$MAVEN_PROJECT_EVAL" | grep -Ev '(^\[|Download\w+:)')
   [ $? -eq 0 ] && [ "$MAVEN_PROJECT_NAME" != "Maven Stub Project (No POM)" ] && PROJECT_NAME=$MAVEN_PROJECT_NAME
 
-  echo $PROJECT_NAME
+  echo " Project name will be: $PROJECT_NAME"
 }
 
 replaceProperties () {
