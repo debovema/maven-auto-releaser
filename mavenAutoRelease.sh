@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 MAVEN_AUTO_RELEASER_VERSION=1.0-beta
 
@@ -370,5 +370,5 @@ cleanUp () {
 }
 
 simpleConsoleLogger () {
-  [ "$2" == "true" ] || echo "$1"
+  [ "$2" = "true" ] || echo "$1"
 }
