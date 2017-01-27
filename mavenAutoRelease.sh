@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 MAVEN_AUTO_RELEASER_VERSION=1.0-beta
 
