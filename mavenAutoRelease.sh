@@ -37,6 +37,7 @@ createReleaseTriggerBranch () {
   # 2. create the release trigger branch (called release by default)
   git symbolic-ref HEAD refs/heads/$RELEASE_TRIGGER_BRANCH &&
   git reset &&
+  (command -v setopt >/dev/null 2>&1 && ([ $? -ne 0 ] || setopt localoptions rmstarsilent)) &&
   rm -rf $TEMP_CLONE_DIRECTORY/* &&
   echo "# $RELEASE_TRIGGER_BRANCH" > README.md &&
   git add README.md &&
@@ -85,7 +86,7 @@ getProjectName () {
   # if POM exists and has a <name> element
   MAVEN_PROJECT_EVAL=$(mvn -N -Dexpression=project.name help:evaluate)
   [ $? -eq 0 ] && MAVEN_PROJECT_NAME=$(echo "$MAVEN_PROJECT_EVAL" | grep -Ev '(^\[|Download\w+:)')
-  [ $? -eq 0 ] && PROJECT_NAME=$MAVEN_PROJECT_NAME
+  [ $? -eq 0 ] && [ "$MAVEN_PROJECT_NAME" != "Maven Stub Project (No POM)" ] && PROJECT_NAME=$MAVEN_PROJECT_NAME
 
   echo $PROJECT_NAME
 }
