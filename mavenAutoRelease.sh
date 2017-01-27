@@ -108,17 +108,7 @@ createReleaseTriggerBranch_initCommandLineArguments () {
   GIT_REPOSITORY_URL=$1
 
   # default values
-  RELEASE_TRIGGER_BRANCH=release
-
-  simpleConsoleLogger "Arguments:" $NO_BANNER
-  # use arguments if they exist
-  if [ "$#" -lt 2 ]; then
-    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as default release trigger branch" $NO_BANNER
-  else
-    RELEASE_TRIGGER_BRANCH=$2
-    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
-  fi
-
+  [ ! -z $RELEASE_TRIGGER_BRANCH ] || RELEASE_TRIGGER_BRANCH=release
 }
 
 ### release triggering ###
@@ -347,7 +337,7 @@ parseCommandLine () {
 
   while true ; do
     case "$1" in
-      --release-trigger-branch) RELEASE_TRIGGER_BRANCH="$2"; shift; shift;;
+      --release-trigger-branch) RELEASE_TRIGGER_BRANCH=$2; shift 2;;
       --no-banner) NO_BANNER=true; shift;;
       --no-cmd-line-override) NO_COMMAND_LINE_OVERRIDE=true; shift;;
       --) shift; break;;
@@ -380,5 +370,5 @@ cleanUp () {
 }
 
 simpleConsoleLogger () {
-  [ "$2"=="true" ] || echo "$1"
+  [ "$2" == "true" ] || echo "$1"
 }
