@@ -2,7 +2,7 @@
 
 ## What it does ?
 
-The Maven auto releaser is a tool to automate the release process of large and complex Maven projects — especially those with a multi-level hierarchy — using Git as Source Code Management tool.
+The Maven auto releaser is a tool to automate the release process of large and complex Maven projects — especially those with a multi-level hierarchy — using Git as their Source Code Management tool.
 
 ## How it works ?
 
