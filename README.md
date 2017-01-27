@@ -1,10 +1,10 @@
 # Maven auto releaser
 
-## What it does ?
+## What it does
 
 The Maven auto releaser is a tool to automate the release process of large and complex Maven projects — especially those with a multi-level hierarchy — using Git as their Source Code Management tool.
 
-## How it works ?
+## How it works
 
 This tool is composed of two parts:
 
@@ -22,7 +22,7 @@ Currently, only Gitlab CI is supported, though adding other Continuous Integrati
 
 #### Gitlab CI
 
-## What is required ?
+## Requirements
 
 * Gitlab & Gitlab CI installed
 * The Gitlab CI runner used to execute release jobs must be able to clone and push from and to the repositories of the projects to release (with SSH keys)
