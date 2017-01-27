@@ -49,7 +49,7 @@ createReleaseTriggerBranch () {
 
   echo "# $RELEASE_TRIGGER_BRANCH" > README.md &&
   git add README.md &&
-  git commit -qm "Creating $RELEASE_TRIGGER_BRANCH branch"
+  git commit -qm "[ci skip] Creating $RELEASE_TRIGGER_BRANCH branch"
 
   # 3. retrieve files and add them to the release trigger branch
   echo "3. Adding content to the release trigger branch"
@@ -69,7 +69,7 @@ createReleaseTriggerBranch () {
   replaceProperties ./release.properties &&
   git add ./release.properties
 
-  git commit -qm "Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
+  git commit -qm "[ci skip] Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
 
   # 4. push the release trigger branch
   echo "4. Pushing the created release trigger branch"
@@ -215,7 +215,7 @@ updateReleaseVersionsAndTrigger () {
     fi
   else
     echo " Pushing to the release trigger branch";
-    git push origin release -q
+    git push origin $RELEASE_TRIGGER_BRANCH -q
   fi
 
   # clean up and restore initial directory
