@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta # this is the displayed version (in banner)
 MAVEN_AUTO_RELEASER_VERSION_TAG=master # this is the Git tag used to retrieve template files
@@ -10,9 +10,10 @@ DEFAULT_SOURCE_BRANCH=master
 
 # the createReleaseTriggerBranch function will:
 #  1. clone a repository (and try to guess a project name)
-#  2. create the release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
-#  3. retrieve template files from https://github.com/debovema/maven-auto-releaser, replace properties in these files and add them to the release trigger branch
-#  4. push the newly created trigger branch
+#  2. checkout the source branch (DEFAULT_SOURCE_BRANCH=master by default)
+#  3. create the release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
+#  4. retrieve template files from https://github.com/debovema/maven-auto-releaser, replace properties in these files and add them to the release trigger branch
+#  5. push the newly created trigger branch
 #
 # arguments are:
 #  gitRepositoryURL [releaseTriggerBranch] [sourceBranch] [gitParentRepositoryURL] [gitParentParentRepositoryURL] [gitParentParentParentRepositoryURL]
@@ -40,10 +41,22 @@ createReleaseTriggerBranch () {
 
   cd $TEMP_CLONE_DIRECTORY
 
+  # 2. checkout the source branch
+  echo "2. Checking out the source branch: $SOURCE_BRANCH"
+  git checkout -q $SOURCE_BRANCH
+  if [ $? -gt 0 ]; then
+    echo " Unable to checkout to $SOURCE_BRANCH branch"
+    cleanUp
+    return 1
+  fi
+
   getProjectName
 
-  # 2. create the release trigger branch
-  echo "2. Create the release trigger"
+  echo
+  echo "== Release trigger branch creation =="
+
+  # 3. create the release trigger branch
+  echo "3. Create the release trigger"
   git symbolic-ref HEAD refs/heads/$RELEASE_TRIGGER_BRANCH &&
   git reset
 
@@ -59,8 +72,8 @@ createReleaseTriggerBranch () {
   git add README.md &&
   git commit -qm "[ci skip] Creating $RELEASE_TRIGGER_BRANCH branch"
 
-  # 3. retrieve files and add them to the release trigger branch
-  echo "3. Adding content to the release trigger branch"
+  # 4. retrieve files and add them to the release trigger branch
+  echo "4. Adding content to the release trigger branch"
     # .gitlab-ci.yml
     wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/.gitlab-ci.yml -O ./.gitlab-ci.yml &&
     replaceProperties ./.gitlab-ci.yml &&
@@ -84,8 +97,11 @@ createReleaseTriggerBranch () {
 
   git commit -qm "[ci skip] Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
 
-  # 4. push the release trigger branch
-  echo "4. Pushing the created release trigger branch"
+  echo
+  echo "== Finalization =="
+
+  # 5. push the release trigger branch
+  echo "5. Pushing the created release trigger branch"
   git push origin $RELEASE_TRIGGER_BRANCH -q
 
   PUSH_BRANCH_RESULT=$?
