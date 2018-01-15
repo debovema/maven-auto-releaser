@@ -1,12 +1,17 @@
 #!/bin/sh
 
-MAVEN_AUTO_RELEASER_VERSION=1.0-beta
+MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta # this is the displayed version (in banner)
+MAVEN_AUTO_RELEASER_VERSION_TAG=master # this is the Git tag used to retrieve template files
+
+DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 
 ### release trigger branch creation ###
 
 # the createReleaseTriggerBranch function will:
-#  1. clone a repository
-#  2. 
+#  1. clone a repository (and try to guess a project name)
+#  2. create the release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
+#  3. retrieve template files from https://github.com/debovema/maven-auto-releaser, replace properties in these files and add them to the release trigger branch
+#  4. push the newly created trigger branch
 #
 # arguments are:
 #  gitRepositoryURL
@@ -34,7 +39,7 @@ createReleaseTriggerBranch () {
 
   getProjectName
 
-  # 2. create the release trigger branch (called release by default)
+  # 2. create the release trigger branch
   echo "2. Create the release trigger"
   git symbolic-ref HEAD refs/heads/$RELEASE_TRIGGER_BRANCH &&
   git reset
@@ -53,21 +58,26 @@ createReleaseTriggerBranch () {
 
   # 3. retrieve files and add them to the release trigger branch
   echo "3. Adding content to the release trigger branch"
-  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/release-trigger-branch/.gitlab-ci.yml -O ./.gitlab-ci.yml &&
-  replaceProperties ./.gitlab-ci.yml &&
-  git add ./.gitlab-ci.yml
-  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/release-trigger-branch/README.md -O ./README.md &&
-  replaceProperties ./README.md &&
-  git add ./README.md
-  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/release-trigger-branch/fullAutoRelease.sh -O ./fullAutoRelease.sh &&
-  replaceProperties ./fullAutoRelease.sh &&
-  git add ./fullAutoRelease.sh
-  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/release-trigger-branch/prepareRelease.sh -O ./prepareRelease.sh &&
-  replaceProperties ./prepareRelease.sh &&
-  git add ./prepareRelease.sh
-  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/release-trigger-branch/release.properties -O ./release.properties &&
-  replaceProperties ./release.properties &&
-  git add ./release.properties
+    # .gitlab-ci.yml
+    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/.gitlab-ci.yml -O ./.gitlab-ci.yml &&
+    replaceProperties ./.gitlab-ci.yml &&
+    git add ./.gitlab-ci.yml
+	# README.md
+    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/README.md -O ./README.md &&
+    replaceProperties ./README.md &&
+    git add ./README.md
+	# fullAutoRelease.sh
+    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/fullAutoRelease.sh -O ./fullAutoRelease.sh &&
+    replaceProperties ./fullAutoRelease.sh &&
+    git add ./fullAutoRelease.sh
+	# prepareRelease.sh
+    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/prepareRelease.sh -O ./prepareRelease.sh &&
+    replaceProperties ./prepareRelease.sh &&
+    git add ./prepareRelease.sh
+	# release.properties
+    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/release.properties -O ./release.properties &&
+    replaceProperties ./release.properties &&
+    git add ./release.properties
 
   git commit -qm "[ci skip] Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
 
@@ -86,6 +96,24 @@ createReleaseTriggerBranch () {
   return 0
 }
 
+createReleaseTriggerBranch_initCommandLineArguments () {
+  unset RELEASE_TRIGGER_BRANCH GIT_REPOSITORY_URL GIT_REPOSITORY_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_PARENT_URL
+
+  if [ "$#" -lt 1 ]; then
+    echo " At least a Git repository URL is required" >&2
+    return 1
+  fi
+
+  GIT_REPOSITORY_URL=$1
+  GIT_REPOSITORY_PARENT_URL=$2
+  GIT_REPOSITORY_PARENT_PARENT_URL=$3
+  GIT_REPOSITORY_PARENT_PARENT_PARENT_URL=$4
+
+  # default values
+  [ ! -z $RELEASE_TRIGGER_BRANCH ] || RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+}
+
+# try to guess project name from repository name or POM if it exists (it should exist!)
 getProjectName () {
   PROJECT_NAME="Unknown project"
 
@@ -108,30 +136,13 @@ replaceProperties () {
   sed -i "s/^\(.*\)\(\$RELEASE_TRIGGER_BRANCH\)\(.*\)$/\1$RELEASE_TRIGGER_BRANCH\3/" $1
 }
 
-createReleaseTriggerBranch_initCommandLineArguments () {
-  unset RELEASE_TRIGGER_BRANCH GIT_REPOSITORY_URL GIT_REPOSITORY_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_PARENT_URL
-
-  if [ "$#" -lt 1 ]; then
-    echo " At least a Git repository URL is required" >&2
-    return 1
-  fi
-
-  GIT_REPOSITORY_URL=$1
-  GIT_REPOSITORY_PARENT_URL=$2
-  GIT_REPOSITORY_PARENT_PARENT_URL=$3
-  GIT_REPOSITORY_PARENT_PARENT_PARENT_URL=$4
-
-  # default values
-  [ ! -z $RELEASE_TRIGGER_BRANCH ] || RELEASE_TRIGGER_BRANCH=release-trigger
-}
-
 ### release triggering ###
 
 # the updateReleaseVersionsAndTrigger function will:
 #  1. clone a repository
 #  2. checkout the source branch (master by default)
 #  3. retrieve the next release and snapshot versions with the provided "increment policy" considering the current versions in the checked out branch
-#  4. checkout the release triggerring branch (release by default)
+#  4. checkout the release triggerring branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
 #  5. update the release and snapshot versions properties in the release properties file (release.properties by default)
 #  6. add, commit & push the changed release properties file (this will trigger the release for the project in the repository)
 #
@@ -244,7 +255,7 @@ updateReleaseVersionsAndTrigger_initCommandLineArguments () {
   # default values
   INCREMENT_POLICY=revision
   SOURCE_BRANCH=master
-  RELEASE_TRIGGER_BRANCH=release
+  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
 
   # use optional release.properties (to retrieve Git user config and to override arguments default values)
   [ ! -f release.properties ] || . ./release.properties
@@ -292,14 +303,14 @@ sourceReleaseProperties () {
     if [ "$NO_COMMAND_LINE_OVERRIDE" == "true" ]; then
       SOURCE_BRANCH=$OLD_SOURCE_BRANCH
     else
-      echo " now using '$SOURCE_BRANCH' as increment policy"
+      echo " now using '$SOURCE_BRANCH' as source branch"
     fi
   fi
   if [ $OLD_RELEASE_TRIGGER_BRANCH != $RELEASE_TRIGGER_BRANCH ]; then
     if [ "$NO_COMMAND_LINE_OVERRIDE" == "true" ]; then
       RELEASE_TRIGGER_BRANCH=$OLD_RELEASE_TRIGGER_BRANCH
     else
-      echo " now using '$RELEASE_TRIGGER_BRANCH' as increment policy"
+      echo " now using '$RELEASE_TRIGGER_BRANCH' as trigger branch"
     fi
   fi
 }
@@ -383,6 +394,7 @@ cleanUp () {
   fi
 }
 
+# log first parameter $1 if second parameter $2 is not "true"
 simpleConsoleLogger () {
   [ "$2" = "true" ] || echo "$1"
 }
