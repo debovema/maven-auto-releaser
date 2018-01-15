@@ -13,7 +13,7 @@ They will all commit & push a change on this branch which will trigger a build o
 
 * checkout this branch (after cloning this repository):
 ```shell
-git checkout release
+git checkout $RELEASE_TRIGGER_BRANCH
 ```
 
 * simply run:
@@ -28,7 +28,7 @@ To trigger a new release of $PROJECT_NAME, follow these steps:
 
 * checkout this branch (after cloning this repository):
 ```shell
-git checkout release
+git checkout $RELEASE_TRIGGER_BRANCH
 ```
 
 * edit Release Version (*0.0.1* is an example):
@@ -46,9 +46,9 @@ DEV_VERSION=0.0.2-SNAPSHOT && sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" 
 git add release.properties && git commit -m "Triggering release"
 ```
 
-* trigger the release by pushing to the release branch:
+* trigger the release by pushing to the release trigger branch:
 ```shell
-git push origin release
+git push origin $RELEASE_TRIGGER_BRANCH
 ```
 
 ## Full documentation
