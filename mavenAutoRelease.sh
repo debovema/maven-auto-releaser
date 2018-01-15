@@ -22,6 +22,12 @@ createReleaseTriggerBranch () {
 	
   createReleaseTriggerBranch_initCommandLineArguments $PARAMETERS
 
+  if [ $? -gt 0 ]; then
+    cleanUp
+    createReleaseTriggerBranch_usage
+    return 1
+  fi
+
   echo
   echo "Creating release trigger branch on repository $GIT_REPOSITORY_URL"
   echo "-> source branch is $SOURCE_BRANCH"
@@ -115,10 +121,16 @@ createReleaseTriggerBranch () {
   return 0
 }
 
+createReleaseTriggerBranch_usage () {
+  echo
+  echo "Usage is $0 URL [arg1] [arg2]"
+}
+
 createReleaseTriggerBranch_initCommandLineArguments () {
   unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH SOURCE_BRANCH GIT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_PARENT_REPOSITORY_URL
 
   if [ "$#" -lt 1 ]; then
+    echo
     echo " At least a Git repository URL is required" >&2
     return 1
   fi
@@ -199,6 +211,12 @@ updateReleaseVersionsAndTrigger () {
   parseCommandLine $@
 
   updateReleaseVersionsAndTrigger_initCommandLineArguments $PARAMETERS
+
+  if [ $? -gt 0 ]; then
+    cleanUp
+    updateReleaseVersionsAndTrigger_usage
+    return 1
+  fi
 
   echo
   echo "Releasing $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH"
@@ -285,6 +303,11 @@ updateReleaseVersionsAndTrigger () {
   rm -rf $TEMP_CLONE_DIRECTORY
 
   return 0
+}
+
+updateReleaseVersionsAndTrigger_usage () {
+  echo
+  echo "Usage is $0 URL [arg1] [arg2]"
 }
 
 updateReleaseVersionsAndTrigger_initCommandLineArguments () {
@@ -395,6 +418,8 @@ updateReleaseVersions () {
 parseCommandLine () {
   unset OPTS NO_BANNER NO_COMMAND_LINE_OVERRIDE RELEASE_TRIGGER_BRANCH
 
+  OLDPWD1=`pwd`
+
   OPTS=`getopt -o '' -l no-banner,no-cmd-line-override,release-trigger-branch: -- "$@"`
 
   if [ $? != 0 ]
@@ -425,7 +450,7 @@ parseCommandLine () {
   PARAMETERS=$(echo $PARAMETERS | xargs)
 
   simpleConsoleLogger "Maven auto releaser v$MAVEN_AUTO_RELEASER_VERSION" $NO_BANNER
-  simpleConsoleLogger " https://github.com/debovema/maven-auto-releaser" $NO_BANNER
+  simpleConsoleLogger " https://github.com/debovema/maven-auto-releaser/tree/$MAVEN_AUTO_RELEASER_VERSION_TAG" $NO_BANNER
 }
 
 cleanUp () {
@@ -433,7 +458,7 @@ cleanUp () {
   if [ -d "$TEMP_CLONE_DIRECTORY" ]; then
     echo
     echo "== Clean up =="
-    cd $OLDPWD
+    cd $OLDPWD1
     echo " Removing temporary directory: $TEMP_CLONE_DIRECTORY"
     rm -rf $TEMP_CLONE_DIRECTORY
     echo
