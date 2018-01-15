@@ -1,9 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta # this is the displayed version (in banner)
 MAVEN_AUTO_RELEASER_VERSION_TAG=master # this is the Git tag used to retrieve template files
 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
+DEFAULT_SOURCE_BRANCH=master
 
 ### release trigger branch creation ###
 
@@ -14,14 +15,16 @@ DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 #  4. push the newly created trigger branch
 #
 # arguments are:
-#  gitRepositoryURL
+#  gitRepositoryURL [releaseTriggerBranch] [sourceBranch] [gitParentRepositoryURL] [gitParentParentRepositoryURL] [gitParentParentParentRepositoryURL]
 createReleaseTriggerBranch () {
   parseCommandLine $@
-
+	
   createReleaseTriggerBranch_initCommandLineArguments $PARAMETERS
 
   echo
-  echo "Creating release trigger branch on repository $GIT_REPOSITORY_URL, release trigger branch will be $RELEASE_TRIGGER_BRANCH"
+  echo "Creating release trigger branch on repository $GIT_REPOSITORY_URL"
+  echo "-> source branch is $SOURCE_BRANCH"
+  echo "-> release trigger branch will be $RELEASE_TRIGGER_BRANCH"
   echo
 
   echo "== Initialization =="
@@ -97,7 +100,7 @@ createReleaseTriggerBranch () {
 }
 
 createReleaseTriggerBranch_initCommandLineArguments () {
-  unset RELEASE_TRIGGER_BRANCH GIT_REPOSITORY_URL GIT_REPOSITORY_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_URL GIT_REPOSITORY_PARENT_PARENT_PARENT_URL
+  unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH SOURCE_BRANCH GIT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_PARENT_REPOSITORY_URL
 
   if [ "$#" -lt 1 ]; then
     echo " At least a Git repository URL is required" >&2
@@ -105,12 +108,38 @@ createReleaseTriggerBranch_initCommandLineArguments () {
   fi
 
   GIT_REPOSITORY_URL=$1
-  GIT_REPOSITORY_PARENT_URL=$2
-  GIT_REPOSITORY_PARENT_PARENT_URL=$3
-  GIT_REPOSITORY_PARENT_PARENT_PARENT_URL=$4
 
   # default values
-  [ ! -z $RELEASE_TRIGGER_BRANCH ] || RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+  SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
+  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+
+  simpleConsoleLogger "" $NO_BANNER
+  simpleConsoleLogger "Arguments:" $NO_BANNER
+  # use arguments if they exist
+  if [ "$#" -lt 2 ]; then
+    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as default release trigger branch" $NO_BANNER
+  else
+    RELEASE_TRIGGER_BRANCH=$2
+    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
+  fi
+  if [ "$#" -lt 3 ]; then
+    simpleConsoleLogger " using '$SOURCE_BRANCH' as default source branch" $NO_BANNER
+  else
+    SOURCE_BRANCH=$3
+    simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
+  fi
+  if [ ! "$#" -lt 4 ]; then
+    GIT_PARENT_REPOSITORY_URL=$4
+    simpleConsoleLogger " using '$GIT_PARENT_REPOSITORY_URL' as parent repository URL" $NO_BANNER
+  fi
+  if [ ! "$#" -lt 5 ]; then
+    GIT_PARENT_PARENT_REPOSITORY_URL=$5
+    simpleConsoleLogger " using '$GIT_PARENT_PARENT_REPOSITORY_URL' as great parent repository URL" $NO_BANNER
+  fi
+  if [ ! "$#" -lt 6 ]; then
+    GIT_PARENT_PARENT_PARENT_REPOSITORY_URL=$6
+    simpleConsoleLogger " using '$GIT_PARENT_PARENT_PARENT_REPOSITORY_URL' as great great parent repository URL" $NO_BANNER
+  fi
 }
 
 # try to guess project name from repository name or POM if it exists (it should exist!)
@@ -140,14 +169,14 @@ replaceProperties () {
 
 # the updateReleaseVersionsAndTrigger function will:
 #  1. clone a repository
-#  2. checkout the source branch (master by default)
+#  2. checkout the source branch (DEFAULT_SOURCE_BRANCH=master by default)
 #  3. retrieve the next release and snapshot versions with the provided "increment policy" considering the current versions in the checked out branch
-#  4. checkout the release triggerring branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
+#  4. checkout the release triggering branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
 #  5. update the release and snapshot versions properties in the release properties file (release.properties by default)
 #  6. add, commit & push the changed release properties file (this will trigger the release for the project in the repository)
 #
 # arguments are:
-#  gitRepositoryURL [incrementPolicy] [sourceBranch] [releaseBranch] [commandLineOverridesConfig]
+#  gitRepositoryURL [incrementPolicy] [releaseTriggerBranch] [sourceBranch] [commandLineOverridesConfig]
 #
 # arguments can also be provided by an optional KEY=VALUE file named release.properties in the same directory of this script
 updateReleaseVersionsAndTrigger () {
@@ -254,12 +283,13 @@ updateReleaseVersionsAndTrigger_initCommandLineArguments () {
 
   # default values
   INCREMENT_POLICY=revision
-  SOURCE_BRANCH=master
+  SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
 
   # use optional release.properties (to retrieve Git user config and to override arguments default values)
   [ ! -f release.properties ] || . ./release.properties
 
+  simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
   # use arguments if they exist
   if [ "$#" -lt 2 ]; then
@@ -269,16 +299,16 @@ updateReleaseVersionsAndTrigger_initCommandLineArguments () {
     simpleConsoleLogger " using '$INCREMENT_POLICY' as increment policy" $NO_BANNER
   fi
   if [ "$#" -lt 3 ]; then
-    simpleConsoleLogger " using '$SOURCE_BRANCH' as default source branch" $NO_BANNER
-  else
-    SOURCE_BRANCH=$3
-    simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
-  fi
-  if [ "$#" -lt 4 ]; then
     simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as default release branch" $NO_BANNER
   else
-    RELEASE_TRIGGER_BRANCH=$4
+    RELEASE_TRIGGER_BRANCH=$3
     simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release branch" $NO_BANNER
+  fi
+  if [ "$#" -lt 4 ]; then
+    simpleConsoleLogger " using '$SOURCE_BRANCH' as default source branch" $NO_BANNER
+  else
+    SOURCE_BRANCH=$4
+    simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
   fi
 }
 
