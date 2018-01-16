@@ -8,8 +8,8 @@ The **Maven auto releaser** is a tool to automate the release process of large a
 
 This tool is composed of **two parts**:
 
-1. **a creation step**: a script to create *release trigger branches* on the repositories of the projects to release
-2. **an execution runtime**: a set of configuration, scripts and Continuous Integration files which will trigger the actual Maven release the classical way (i.e. with the [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin) or the [unleash-maven-plugin](https://github.com/shillner/unleash-maven-plugin))
+1. **a creation step**: a script to create *release trigger branches* on the repositories of the projects to release. This step is a one-shot action for a given repository.
+2. **an execution runtime**: a set of configuration, scripts and Continuous Integration files which will trigger the actual Maven release the classical way (i.e. with the [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin) or the [unleash-maven-plugin](https://github.com/shillner/unleash-maven-plugin)). This execution runtime is used whenever a release is to be created on a given repository.
 
 ### The *release trigger branch* concept
 
