@@ -8,17 +8,28 @@ The **Maven auto releaser** is a tool to automate the release process of large a
 
 This tool is composed of **two parts**:
 
-* a script to create *release trigger branches* on the repositories of the projects to release
-* a set of Continuous Integration configuration and scripts files which will trigger the actual Maven release the classical way (i.e. with the [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin) or the [unleash-maven-plugin](https://github.com/shillner/unleash-maven-plugin))
+1. **a creation step**: a script to create *release trigger branches* on the repositories of the projects to release
+2. **an execution runtime**: a set of configuration, scripts and Continuous Integration files which will trigger the actual Maven release the classical way (i.e. with the [maven-release-plugin](http://maven.apache.org/maven-release/maven-release-plugin) or the [unleash-maven-plugin](https://github.com/shillner/unleash-maven-plugin))
 
 ### The *release trigger branch* concept
 
-The main idea is to create a Git branch on all repositories of the projects to release called the *release trigger branch*.
+The main idea behind the *release trigger branch* concept is to create a Git branch on all repositories of the projects to release called the *release trigger branch*.
+
 This branch will be composed of:
 * a Continuous Integration configuration file (for Gitlab CI, it's the *.gitlab-cy.yml*). In this file, a trigger is set to be executed **whenever a commit is pushed on the _release trigger branch_**.
-* a *release.properties* file with information for the next version to be released 
-* a script caled by the Continuous Integration trigger.
-* 
+* a *release.properties* file with information for the next version to be released.
+* a preparation script, *prepareRelease.sh*, called by the Continuous Integration trigger. It will clone the repository and checkout the source branch and configure Git with username and email.
+* an execution script, *release.sh*, called by the Continuous Integration trigger. It will execute the actual release Maven build.
+
+### Remote vs Standalone mode
+
+The preparation and execution scripts above (*prepareRelease.sh* and *release.sh*) always exist in the *release trigger branch*.
+
+The difference between the two modes are:
+* in **remote mode** the [**creation step**](#how-it-works) will only write links to the actual scripts which will be downloaded from this repository (https://github.com/debovema/maven-auto-releaser) based on the version used during the **creation step**.
+Main advantage is that it is easy to update to the latest version of the **Maven auto releaser** tool by changing the version in the existing *release trigger branches* of your repositories.
+* **local mode** will copy the content of scripts from this repository (https://github.com/debovema/maven-auto-releaser) during the **creation step**.
+Main advantage is that the repositories with *release trigger branches* does not rely on the **Maven auto releaser** tool once they have been initialized (especially if release environment has no access to the Internet). On the other hand, the **Maven auto releaser** tool becomes ***very hard to update in this mode***.
 
 ### List of supported properties in *release.properties*
 
