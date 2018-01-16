@@ -188,9 +188,13 @@ getProjectName () {
 
 replaceProperties () {
   GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed 's/[\/&]/\\&/g')
+  GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL_ESCAPED | cut -f 1 -d '.')
   sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_URL\)\(.*\)$/\1$GIT_REPOSITORY_URL_ESCAPED\3/" $1
+  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_BASENAME\)\(.*\)$/\1$GIT_REPOSITORY_BASENAME\3/" $1
   sed -i "s/^\(.*\)\(\$PROJECT_NAME\)\(.*\)$/\1$PROJECT_NAME\3/" $1
   sed -i "s/^\(.*\)\(\$RELEASE_TRIGGER_BRANCH\)\(.*\)$/\1$RELEASE_TRIGGER_BRANCH\3/" $1
+  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION_TAG\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION_TAG\3/" $1
+  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION\3/" $1
 }
 
 ### release triggering ###
