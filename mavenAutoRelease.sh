@@ -123,7 +123,7 @@ createReleaseTriggerBranch () {
 
 createReleaseTriggerBranch_usage () {
   echo
-  echo "Usage is $0 URL [arg1] [arg2]"
+  echo "Usage is $0 URL gitRepositoryURL [releaseTriggerBranch] [sourceBranch] [gitParentRepositoryURL] [gitParentParentRepositoryURL] [gitParentParentParentRepositoryURL]"
 }
 
 createReleaseTriggerBranch_initCommandLineArguments () {
@@ -311,7 +311,7 @@ updateReleaseVersionsAndTrigger () {
 
 updateReleaseVersionsAndTrigger_usage () {
   echo
-  echo "Usage is $0 URL [arg1] [arg2]"
+  echo "Usage is $0 gitRepositoryURL [incrementPolicy] [releaseTriggerBranch] [sourceBranch]"
 }
 
 updateReleaseVersionsAndTrigger_initCommandLineArguments () {
