@@ -77,7 +77,7 @@ git checkout $(git describe --tags)
 
 ```shell
 GIT_REPOSITORY_URL=<URL of the Git repository>
-bash -c 'source ./mavenAutoRelease.sh && createReleaseTriggerBranch $GIT_REPOSITORY_URL'
+bash -c 'source ./maven-auto-release.sh && createReleaseTriggerBranch $GIT_REPOSITORY_URL'
 ```
 
 5. follow the instructions of the README file created on the release trigger branch of the Git repository

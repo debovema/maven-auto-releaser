@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# maven-auto-releaser.sh
+# released by Mathieu Debove (https://github.com/debovema) under Apache License, Version 2.0
+
 MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta # this is the displayed version (in banner)
 MAVEN_AUTO_RELEASER_VERSION_TAG=master # this is the Git tag used to retrieve template files
 
