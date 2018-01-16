@@ -1,5 +1,7 @@
 # $PROJECT_NAME
 
+This branch (*$RELEASE_TRIGGER_BRANCH*) is the [**release trigger branch**](#release-trigger-branch) for the **$PROJECT_NAME** project.
+
 ## Release trigger branch
 
 This branch is a release trigger. It means that **whenever a commit is pushed on this branch**, a release job, defined in [*.gitlab-ci.yml*](./.gitlab-ci.yml) file, will be launched, based on properties set in [*release.properties*](./release.properties) file.
