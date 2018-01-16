@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # retrieve Maven auto release script
-wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/master/mavenAutoRelease.sh -O /tmp/mavenAutoRelease.sh
+wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/mavenAutoRelease.sh -O /tmp/mavenAutoRelease.sh
 chmod u+x /tmp/mavenAutoRelease.sh
 . /tmp/mavenAutoRelease.sh
 
