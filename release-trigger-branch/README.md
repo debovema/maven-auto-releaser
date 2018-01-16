@@ -9,26 +9,39 @@ This branch is a release trigger. It means that **whenever a commit is pushed on
 ## How to trigger a release ?
 
 There is two different methods to trigger a release.
-They will all commit & push a change on this branch which will trigger a build on Gitlab CI.
+They will both commit & push a change on this *release trigger branch* which will trigger a build on Gitlab CI.
 
 ### automatically, with parent projects released before
 
-* checkout this branch (after cloning this repository):
+* clone this repository:
+```shell
+git clone $GIT_REPOSITORY_URL
+cd $GIT_REPOSITORY_BASENAME
+```
+
+* checkout this branch:
 ```shell
 git checkout $RELEASE_TRIGGER_BRANCH
 ```
 
 * simply run:
 ```shell
+chmod u+x ./fullAutoRelease.sh
 ./fullAutoRelease.sh
 ```
 
-This script will update the [*release.properties*](./release.properties) file with next versions then commit and push this file on this release trigger branch, hence triggering a release.
+This script will update the [*release.properties*](./release.properties) file with next versions then commit and push this file on this *release trigger branch*, hence triggering a release.
 
 ### setting manually the versions, without triggering releases for ancestors
-To trigger a new release of $PROJECT_NAME, follow these steps:
+To trigger a new release of **$PROJECT_NAME**, follow these steps:
 
-* checkout this branch (after cloning this repository):
+* clone this repository:
+```shell
+git clone $GIT_REPOSITORY_URL
+cd $GIT_REPOSITORY_BASENAME
+```
+
+* checkout this branch:
 ```shell
 git checkout $RELEASE_TRIGGER_BRANCH
 ```
@@ -48,11 +61,11 @@ DEV_VERSION=0.0.2-SNAPSHOT && sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" 
 git add release.properties && git commit -m "Triggering release"
 ```
 
-* trigger the release by pushing to the release trigger branch:
+* trigger the release by pushing to the *release trigger branch*:
 ```shell
 git push origin $RELEASE_TRIGGER_BRANCH
 ```
 
 ## Full documentation
 
-The full documentation for the Maven auto releaser can be found at https://github.com/debovema/maven-auto-releaser
+The full documentation for the Maven auto releaser v$MAVEN_AUTO_RELEASER_VERSION can be found at https://github.com/debovema/maven-auto-releaser/blob/$MAVEN_AUTO_RELEASER_VERSION_TAG/README.md.
