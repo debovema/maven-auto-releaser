@@ -187,7 +187,7 @@ getProjectName () {
 }
 
 replaceProperties () {
-  GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed -e 's/[\/&]/\\&/g')
+  GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed 's/[\/&]/\\&/g')
   sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_URL\)\(.*\)$/\1$GIT_REPOSITORY_URL_ESCAPED\3/" $1
   sed -i "s/^\(.*\)\(\$PROJECT_NAME\)\(.*\)$/\1$PROJECT_NAME\3/" $1
   sed -i "s/^\(.*\)\(\$RELEASE_TRIGGER_BRANCH\)\(.*\)$/\1$RELEASE_TRIGGER_BRANCH\3/" $1
