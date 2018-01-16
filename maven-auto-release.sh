@@ -17,13 +17,10 @@ DEFAULT_SOURCE_BRANCH=master
 #  3. create the release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
 #  4. retrieve template files from https://github.com/debovema/maven-auto-releaser, replace properties in these files and add them to the release trigger branch
 #  5. push the newly created trigger branch
-#
-# arguments are:
-#  gitRepositoryURL [releaseTriggerBranch] [sourceBranch] [gitParentRepositoryURL] [gitParentParentRepositoryURL] [gitParentParentParentRepositoryURL]
 createReleaseTriggerBranch () {
   parseCommandLine $@
 	
-  createReleaseTriggerBranch_initCommandLineArguments $PARAMETERS
+  createReleaseTriggerBranch_loadPropertiesFromFile $PARAMETERS
 
   if [ $? -gt 0 ]; then
     cleanUp
@@ -83,23 +80,23 @@ createReleaseTriggerBranch () {
 
   # 4. retrieve files and add them to the release trigger branch
   echo "4. Adding content to the release trigger branch"
-    # .gitlab-ci.yml
+  # .gitlab-ci.yml
     wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/.gitlab-ci.yml -O ./.gitlab-ci.yml &&
     replaceProperties ./.gitlab-ci.yml &&
     git add ./.gitlab-ci.yml
-	# README.md
+  # README.md
     wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/README.md -O ./README.md &&
     replaceProperties ./README.md &&
     git add ./README.md
-	# fullAutoRelease.sh
+  # fullAutoRelease.sh
     wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/fullAutoRelease.sh -O ./fullAutoRelease.sh &&
     replaceProperties ./fullAutoRelease.sh &&
     git add ./fullAutoRelease.sh
-	# prepareRelease.sh
+  # prepareRelease.sh
     wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/prepareRelease.sh -O ./prepareRelease.sh &&
     replaceProperties ./prepareRelease.sh &&
     git add ./prepareRelease.sh
-	# release.properties
+  # release.properties
     wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/release.properties -O ./release.properties &&
     replaceProperties ./release.properties &&
     git add ./release.properties
@@ -126,10 +123,10 @@ createReleaseTriggerBranch () {
 
 createReleaseTriggerBranch_usage () {
   echo
-  echo "Usage is $0 URL gitRepositoryURL [releaseTriggerBranch] [sourceBranch] [gitParentRepositoryURL] [gitParentParentRepositoryURL] [gitParentParentParentRepositoryURL]"
+  echo "Usage is $0 gitRepositoryURL"
 }
 
-createReleaseTriggerBranch_initCommandLineArguments () {
+createReleaseTriggerBranch_loadPropertiesFromFile () {
   unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH SOURCE_BRANCH GIT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_PARENT_REPOSITORY_URL
 
   if [ "$#" -lt 1 ]; then
@@ -144,33 +141,15 @@ createReleaseTriggerBranch_initCommandLineArguments () {
   SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
 
+  source ./branch.properties
+
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
-  # use arguments if they exist
-  if [ "$#" -lt 2 ]; then
-    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as default release trigger branch" $NO_BANNER
-  else
-    RELEASE_TRIGGER_BRANCH=$2
-    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
-  fi
-  if [ "$#" -lt 3 ]; then
-    simpleConsoleLogger " using '$SOURCE_BRANCH' as default source branch" $NO_BANNER
-  else
-    SOURCE_BRANCH=$3
-    simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
-  fi
-  if [ ! "$#" -lt 4 ]; then
-    GIT_PARENT_REPOSITORY_URL=$4
-    simpleConsoleLogger " using '$GIT_PARENT_REPOSITORY_URL' as parent repository URL" $NO_BANNER
-  fi
-  if [ ! "$#" -lt 5 ]; then
-    GIT_PARENT_PARENT_REPOSITORY_URL=$5
-    simpleConsoleLogger " using '$GIT_PARENT_PARENT_REPOSITORY_URL' as great parent repository URL" $NO_BANNER
-  fi
-  if [ ! "$#" -lt 6 ]; then
-    GIT_PARENT_PARENT_PARENT_REPOSITORY_URL=$6
-    simpleConsoleLogger " using '$GIT_PARENT_PARENT_PARENT_REPOSITORY_URL' as great great parent repository URL" $NO_BANNER
-  fi
+  simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
+  simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
+#  simpleConsoleLogger " using '$GIT_PARENT_REPOSITORY_URL' as parent repository URL" $NO_BANNER
+#  simpleConsoleLogger " using '$GIT_PARENT_PARENT_REPOSITORY_URL' as great parent repository URL" $NO_BANNER
+#  simpleConsoleLogger " using '$GIT_PARENT_PARENT_PARENT_REPOSITORY_URL' as great great parent repository URL" $NO_BANNER
 }
 
 # try to guess project name from repository name or POM if it exists (it should exist!)
@@ -210,18 +189,14 @@ replaceProperties () {
 #  5. update the release and snapshot versions properties in the release properties file (release.properties by default)
 #  6. add, commit & push the changed release properties file (this will trigger the release for the project in the repository)
 #
-# arguments are:
-#  gitRepositoryURL [incrementPolicy] [releaseTriggerBranch] [sourceBranch] [commandLineOverridesConfig]
-#
-# arguments can also be provided by an optional KEY=VALUE file named release.properties in the same directory of this script
-updateReleaseVersionsAndTrigger () {
+# arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
+executeRelease () {
   parseCommandLine $@
 
-  updateReleaseVersionsAndTrigger_initCommandLineArguments $PARAMETERS
+  executeRelease_loadPropertiesFromFile $PARAMETERS
 
   if [ $? -gt 0 ]; then
     cleanUp
-    updateReleaseVersionsAndTrigger_usage
     return 1
   fi
 
@@ -250,8 +225,6 @@ updateReleaseVersionsAndTrigger () {
     cleanUp
     return 1
   fi
-
-  sourceReleaseProperties
 
   echo
   echo "== Versions update =="
@@ -312,12 +285,7 @@ updateReleaseVersionsAndTrigger () {
   return 0
 }
 
-updateReleaseVersionsAndTrigger_usage () {
-  echo
-  echo "Usage is $0 gitRepositoryURL [incrementPolicy] [releaseTriggerBranch] [sourceBranch]"
-}
-
-updateReleaseVersionsAndTrigger_initCommandLineArguments () {
+executeRelease_loadPropertiesFromFile () {
   unset RELEASE_VERSION DEV_VERSION GIT_USER_NAME GIT_USER_EMAIL GIT_REPOSITORY_URL INCREMENT_POLICY SOURCE_BRANCH RELEASE_TRIGGER_BRANCH
 
   if [ "$#" -lt 1 ]; then
@@ -332,63 +300,14 @@ updateReleaseVersionsAndTrigger_initCommandLineArguments () {
   SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
 
-  # use optional release.properties (to retrieve Git user config and to override arguments default values)
-  [ ! -f release.properties ] || . ./release.properties
+  # use release.properties (to retrieve Git user config and to override arguments default values)
+  source ./release.properties
 
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
-  # use arguments if they exist
-  if [ "$#" -lt 2 ]; then
-    simpleConsoleLogger " using '$INCREMENT_POLICY' as default increment policy" $NO_BANNER
-  else
-    INCREMENT_POLICY=$2
-    simpleConsoleLogger " using '$INCREMENT_POLICY' as increment policy" $NO_BANNER
-  fi
-  if [ "$#" -lt 3 ]; then
-    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as default release branch" $NO_BANNER
-  else
-    RELEASE_TRIGGER_BRANCH=$3
-    simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release branch" $NO_BANNER
-  fi
-  if [ "$#" -lt 4 ]; then
-    simpleConsoleLogger " using '$SOURCE_BRANCH' as default source branch" $NO_BANNER
-  else
-    SOURCE_BRANCH=$4
-    simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
-  fi
-}
-
-sourceReleaseProperties () {
-  # use optional release.properties (to retrieve Git user config and to override increment policy)
-  # this is not the same one as previous one but the one from the repository
-  OLD_INCREMENT_POLICY=$INCREMENT_POLICY
-  OLD_SOURCE_BRANCH=$SOURCE_BRANCH
-  OLD_RELEASE_TRIGGER_BRANCH=$RELEASE_TRIGGER_BRANCH
-
-  echo " Sourcing release.properties file"
-  [ ! -f release.properties ] || . ./release.properties
-
-  if [ $OLD_INCREMENT_POLICY != $INCREMENT_POLICY ]; then
-    if [ "$NO_COMMAND_LINE_OVERRIDE" == "true" ]; then
-      INCREMENT_POLICY=$OLD_INCREMENT_POLICY
-    else
-      echo " now using '$INCREMENT_POLICY' as increment policy"
-    fi
-  fi
-  if [ $OLD_SOURCE_BRANCH != $SOURCE_BRANCH ]; then
-    if [ "$NO_COMMAND_LINE_OVERRIDE" == "true" ]; then
-      SOURCE_BRANCH=$OLD_SOURCE_BRANCH
-    else
-      echo " now using '$SOURCE_BRANCH' as source branch"
-    fi
-  fi
-  if [ $OLD_RELEASE_TRIGGER_BRANCH != $RELEASE_TRIGGER_BRANCH ]; then
-    if [ "$NO_COMMAND_LINE_OVERRIDE" == "true" ]; then
-      RELEASE_TRIGGER_BRANCH=$OLD_RELEASE_TRIGGER_BRANCH
-    else
-      echo " now using '$RELEASE_TRIGGER_BRANCH' as trigger branch"
-    fi
-  fi
+  simpleConsoleLogger " using '$INCREMENT_POLICY' as increment policy" $NO_BANNER
+  simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release branch" $NO_BANNER
+  simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
 }
 
 updateReleaseVersions () {
