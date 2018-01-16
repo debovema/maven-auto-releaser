@@ -26,9 +26,9 @@ This branch will be composed of:
 The preparation and execution scripts above (*prepareRelease.sh* and *release.sh*) always exist in the *release trigger branch*.
 
 The difference between the two modes are:
-* in **remote mode** the [**creation step**](#how-it-works) will only write links to the actual scripts which will be downloaded from this repository (https://github.com/debovema/maven-auto-releaser) based on the version used during the **creation step**.
+* in **remote mode** the [**creation step**](#how-it-works) will only write links to the actual scripts which will be downloaded from this repository (https://github.com/debovema/maven-auto-releaser) by the **execution runtime** based on the version used during the **creation step**.
 Main advantage is that it is easy to update to the latest version of the **Maven auto releaser** tool by changing the version in the existing *release trigger branches* of your repositories.
-* **local mode** will copy the content of scripts from this repository (https://github.com/debovema/maven-auto-releaser) during the **creation step**.
+* **local mode** will copy the content of scripts at their current version from this repository (https://github.com/debovema/maven-auto-releaser) during the **creation step**.
 Main advantage is that the repositories with *release trigger branches* does not rely on the **Maven auto releaser** tool once they have been initialized (especially if release environment has no access to the Internet). On the other hand, the **Maven auto releaser** tool becomes ***very hard to update in this mode***.
 
 ### List of supported properties in *release.properties*
@@ -67,13 +67,20 @@ git clone https://github.com/debovema/maven-auto-releaser.git
 cd maven-auto-releaser
 ```
 
-3. create a release trigger branch on the repositories
+3. checkout the latest Git tag (= latest release) (or any version you want to use):
 
 ```shell
-. ./mavenAutoRelease.sh && createReleaseTriggerBranch <URL of the Git repository>
+git checkout $(git describe --tags)
 ```
 
-4. follow the instructions of the README file created on the release trigger branch of the Git repository
+4. create a release trigger branch on the repositories
+
+```shell
+GIT_REPOSITORY_URL=<URL of the Git repository>
+bash -c 'source ./mavenAutoRelease.sh && createReleaseTriggerBranch $GIT_REPOSITORY_URL'
+```
+
+5. follow the instructions of the README file created on the release trigger branch of the Git repository
 
 ## Licensing
 
