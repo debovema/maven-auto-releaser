@@ -11,7 +11,7 @@ This branch is a release trigger. It means that **whenever a commit is pushed on
 There is two different methods to trigger a release.
 They will both commit & push a change on this *release trigger branch* which will trigger a build on Gitlab CI.
 
-### automatically, with parent projects released before
+### automatically
 
 * clone this repository:
 ```shell
@@ -30,9 +30,9 @@ chmod u+x ./fullAutoRelease.sh
 ./fullAutoRelease.sh
 ```
 
-This script will update the [*release.properties*](./release.properties) file with next versions then commit and push this file on this *release trigger branch*, hence triggering a release.
+This script will update the [*release.properties*](./release.properties) file with next versions (based on ```INCREMENT_POLICY``` set in [*release.properties*](./release.properties)) then commit and push this file on this *release trigger branch*, hence triggering a release.
 
-### setting manually the versions, without triggering releases for ancestors
+### setting manually the versions
 To trigger a new release of **$PROJECT_NAME**, follow these steps:
 
 * clone this repository:
