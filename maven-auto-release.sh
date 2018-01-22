@@ -47,6 +47,9 @@ createReleaseTriggerBranch () {
 
   cd $TEMP_CLONE_DIRECTORY
 
+  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
+  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
+
   # 2. checkout the source branch
   echo "2. Checking out the source branch: $SOURCE_BRANCH"
   git checkout -q $SOURCE_BRANCH
