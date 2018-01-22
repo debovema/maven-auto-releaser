@@ -4,7 +4,7 @@
 # released by Mathieu Debove (https://github.com/debovema) under Apache License, Version 2.0
 
 MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta3 # this is the displayed version (in banner)
-MAVEN_AUTO_RELEASER_VERSION_TAG=v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
+MAVEN_AUTO_RELEASER_VERSION_TAG=master #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 DEFAULT_SOURCE_BRANCH=master
@@ -182,7 +182,7 @@ replaceProperties () {
 
 ### release triggering ###
 
-# the updateReleaseVersionsAndTrigger function will:
+# the executeRelease function will:
 #  1. clone a repository
 #  2. checkout the source branch (DEFAULT_SOURCE_BRANCH=master by default)
 #  3. retrieve the next release and snapshot versions with the provided "increment policy" considering the current versions in the checked out branch
