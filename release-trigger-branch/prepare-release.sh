@@ -1,6 +1,6 @@
 #!/bin/sh
 
-chmod $PREPARE_RELEASE_SH_CHMOD ./prepareRelease.sh
+chmod $PREPARE_RELEASE_SH_CHMOD ./prepare-release.sh
 
 . release.properties
 

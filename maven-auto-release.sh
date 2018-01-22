@@ -81,26 +81,21 @@ createReleaseTriggerBranch () {
   # 4. retrieve files and add them to the release trigger branch
   echo "4. Adding content to the release trigger branch"
   # .gitlab-ci.yml
-    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/.gitlab-ci.yml -O ./.gitlab-ci.yml &&
-    replaceProperties ./.gitlab-ci.yml &&
-    git add ./.gitlab-ci.yml
+    FILE_TO_COPY=.gitlab-ci.yml
+    copyFileFromToReleaseTriggerBranch  
   # README.md
-    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/README.md -O ./README.md &&
-    replaceProperties ./README.md &&
-    git add ./README.md
-  # fullAutoRelease.sh
-    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/fullAutoRelease.sh -O ./fullAutoRelease.sh &&
-    replaceProperties ./fullAutoRelease.sh &&
-    git add ./fullAutoRelease.sh
-  # prepareRelease.sh
-    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/prepareRelease.sh -O ./prepareRelease.sh &&
-    replaceProperties ./prepareRelease.sh &&
-    git add ./prepareRelease.sh
+    FILE_TO_COPY=README.md
+    copyFileFromToReleaseTriggerBranch  
+  # release.sh
+    FILE_TO_COPY=release.sh
+    copyFileFromToReleaseTriggerBranch  
+  # prepare-release.sh
+    FILE_TO_COPY=prepare-release.sh
+    copyFileFromToReleaseTriggerBranch  
   # release.properties
-    wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/release.properties -O ./release.properties &&
-    replaceProperties ./release.properties &&
-    git add ./release.properties
-
+    FILE_TO_COPY=release.properties
+    copyFileFromToReleaseTriggerBranch  
+ 
   git commit -qm "[ci skip] Adding auto release scripts to $RELEASE_TRIGGER_BRANCH branch"
 
   echo
@@ -119,6 +114,12 @@ createReleaseTriggerBranch () {
 
   cleanUp
   return 0
+}
+
+copyFileFromToReleaseTriggerBranch  () {
+  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/$FILE_TO_COPY -O ./$FILE_TO_COPY &&
+  replaceProperties ./$FILE_TO_COPY &&
+  git add ./$FILE_TO_COPY
 }
 
 createReleaseTriggerBranch_usage () {
