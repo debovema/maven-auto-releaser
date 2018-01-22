@@ -33,7 +33,6 @@ chmod u+x ./fullAutoRelease.sh
 This script will update the [*release.properties*](./release.properties) file with next versions (based on ```INCREMENT_POLICY``` set in [*release.properties*](./release.properties)) then commit and push this file on this *release trigger branch*, hence triggering a release.
 
 ### setting manually the versions
-To trigger a new release of **$PROJECT_NAME**, follow these steps:
 
 * clone this repository:
 ```shell
