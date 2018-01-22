@@ -19,7 +19,7 @@ DEFAULT_SOURCE_BRANCH=master
 #  5. push the newly created trigger branch
 createReleaseTriggerBranch () {
   parseCommandLine $@
-	
+
   createReleaseTriggerBranch_loadPropertiesFromFile $PARAMETERS
 
   if [ $? -gt 0 ]; then
@@ -141,7 +141,7 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
   SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
 
-  source ./branch.properties
+  [ -f ./branch.properties ] && source ./branch.properties
 
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
@@ -171,6 +171,7 @@ getProjectName () {
 replaceProperties () {
   GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed 's/[\/&]/\\&/g')
   GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL_ESCAPED | cut -f 1 -d '.')
+
   sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_URL\)\(.*\)$/\1$GIT_REPOSITORY_URL_ESCAPED\3/" $1
   sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_BASENAME\)\(.*\)$/\1$GIT_REPOSITORY_BASENAME\3/" $1
   sed -i "s/^\(.*\)\(\$PROJECT_NAME\)\(.*\)$/\1$PROJECT_NAME\3/" $1
@@ -343,6 +344,8 @@ updateReleaseVersions () {
 # this will also set PARAMETERS variable with all command line arguments without switches
 parseCommandLine () {
   unset OPTS NO_BANNER NO_COMMAND_LINE_OVERRIDE RELEASE_TRIGGER_BRANCH
+
+  [ -z ${JAVA_HOME+x} ] && echo "JAVA_HOME is not set!" && exit 1
 
   OLDPWD1=`pwd`
 
