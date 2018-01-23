@@ -337,7 +337,7 @@ executeRelease () {
 
   # 6. trigger the release by pushing the new file
   echo "6. Triggering the release"
-  git add release.properties && git commit -m "Triggering release" &> /dev/null
+  git add release.properties && git commit -qm "Triggering release"
   COMMIT_RESULT=$?
   if [ $COMMIT_RESULT -gt 0 ]; then
     echo " A problem occurred while committing, not pushing anything"
