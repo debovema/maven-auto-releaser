@@ -414,15 +414,12 @@ replaceProperties () {
   replaceProperty $1 GIT_REPOSITORY_URL $GIT_REPOSITORY_URL_ESCAPED
   replaceProperty $1 GIT_REPOSITORY_BASENAME
   replaceProperty $1 PROJECT_NAME
+  replaceProperty $1 SOURCE_BRANCH
   replaceProperty $1 RELEASE_TRIGGER_BRANCH
+  replaceProperty $1 GIT_USER_NAME
+  replaceProperty $1 GIT_USER_EMAIL
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
-#  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_URL\)\(.*\)$/\1$GIT_REPOSITORY_URL_ESCAPED\3/" $1
-#  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_BASENAME\)\(.*\)$/\1$GIT_REPOSITORY_BASENAME\3/" $1
-#  sed -i "s/^\(.*\)\(\$PROJECT_NAME\)\(.*\)$/\1$PROJECT_NAME\3/" $1
-#  sed -i "s/^\(.*\)\(\$RELEASE_TRIGGER_BRANCH\)\(.*\)$/\1$RELEASE_TRIGGER_BRANCH\3/" $1
-#  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION_TAG\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION_TAG\3/" $1
-#  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION\3/" $1
 }
 
 replaceProperty () {
