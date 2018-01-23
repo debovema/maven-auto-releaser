@@ -328,6 +328,13 @@ executeRelease () {
   [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
   [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
 
+  # check whether the repository is clean (nothing to add)
+  if [ -z $(git status -s) ]; then
+    echo " No change since last release. Aborting."
+    cleanUp
+    return 1
+  fi
+
   # 6. trigger the release by pushing the new file
   echo "6. Triggering the release"
   git add release.properties && git commit -m "Triggering release" &> /dev/null
