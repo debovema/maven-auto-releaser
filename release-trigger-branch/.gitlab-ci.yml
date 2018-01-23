@@ -1,22 +1,24 @@
 image: $DOCKER_IMAGE
 
 before_script:
-    # install ssh-agent
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    # run ssh-agent
-    - eval $(ssh-agent -s)
-    # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
-    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  # install ssh-agent
+  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  # run ssh-agent
+  - eval $(ssh-agent -s)
+  # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+
+stages:
+  - release
 
 release:
-    stage:
-        - release
-    tags:
-        - docker
-    script:
-        - ls -la
-        - git status
-        - source ./release.sh
-        - doRelease
-    only:
-        - $RELEASE_TRIGGER_BRANCH
+  stage: release
+  tags:
+    - docker
+  script:
+    - ls -la
+    - git status
+    - source ./release.sh
+    - doRelease
+  only:
+    - $RELEASE_TRIGGER_BRANCH
