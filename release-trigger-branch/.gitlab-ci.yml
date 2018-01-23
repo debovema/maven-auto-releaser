@@ -1,4 +1,4 @@
-image: debovema/docker-mvn
+image: $DOCKER_IMAGE
 
 before_script:
     - export PREPARE_RELEASE_SH_CHMOD=`stat --format '%a' ./prepare-release.sh`
