@@ -172,17 +172,80 @@ getProjectName () {
   echo " Project name will be: $PROJECT_NAME"
 }
 
-replaceProperties () {
-  GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed 's/[\/&]/\\&/g')
-  GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL_ESCAPED | cut -f 1 -d '.')
+# the deleteReleaseTriggerBranch function will:
+#  1. clone a repository
+#  2. delete the release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
+deleteReleaseTriggerBranch () {
+  parseCommandLine $@
 
-  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_URL\)\(.*\)$/\1$GIT_REPOSITORY_URL_ESCAPED\3/" $1
-  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_BASENAME\)\(.*\)$/\1$GIT_REPOSITORY_BASENAME\3/" $1
-  sed -i "s/^\(.*\)\(\$PROJECT_NAME\)\(.*\)$/\1$PROJECT_NAME\3/" $1
-  sed -i "s/^\(.*\)\(\$RELEASE_TRIGGER_BRANCH\)\(.*\)$/\1$RELEASE_TRIGGER_BRANCH\3/" $1
-  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION_TAG\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION_TAG\3/" $1
-  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION\3/" $1
+  deleteReleaseTriggerBranch_loadPropertiesFromFile $PARAMETERS
+
+  if [ $? -gt 0 ]; then
+    cleanUp
+    deleteReleaseTriggerBranch_usage
+    return 1
+  fi
+
+  echo
+  echo "Deleting release trigger branch on repository $GIT_REPOSITORY_URL"
+  echo "-> release trigger branch is $RELEASE_TRIGGER_BRANCH"
+  echo
+
+  echo "== Initialization =="
+  # 1. clone the repository to a temporary directory
+  TEMP_CLONE_DIRECTORY=$(mktemp -d)
+  echo "1. Cloning the repository at $GIT_REPOSITORY_URL to $TEMP_CLONE_DIRECTORY"
+  git clone -q $GIT_REPOSITORY_URL $TEMP_CLONE_DIRECTORY
+  if [ $? -gt 0 ]; then
+    cleanUp
+    echo " Unable to clone $GIT_REPOSITORY_URL"
+    return 1
+  fi
+
+  cd $TEMP_CLONE_DIRECTORY
+
+  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
+  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
+
+  # 2. delete the release trigger branch
+  echo "2. Deleting remote release trigger branch '$RELEASE_TRIGGER_BRANCH'"
+  git push -q -d origin $RELEASE_TRIGGER_BRANCH # TODO: what if remote name is not origin ?
+  if [ $? -gt 0 ]; then
+    echo " Unable to delete $RELEASE_TRIGGER_BRANCH branch"
+    cleanUp
+    return 1
+  fi
+
+  cleanUp
+  return 0
 }
+
+deleteReleaseTriggerBranch_usage () {
+  echo
+  echo "Usage is $0 gitRepositoryURL"
+}
+
+deleteReleaseTriggerBranch_loadPropertiesFromFile () {
+  unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH
+
+  if [ "$#" -lt 1 ]; then
+    echo
+    echo " At least a Git repository URL is required" >&2
+    return 1
+  fi
+
+  GIT_REPOSITORY_URL=$1
+
+  # default values
+  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+
+  [ -f ./branch.properties ] && source ./branch.properties
+
+  simpleConsoleLogger "" $NO_BANNER
+  simpleConsoleLogger "Arguments:" $NO_BANNER
+  simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
+}
+
 
 ### release triggering ###
 
@@ -343,6 +406,33 @@ updateReleaseVersions () {
 }
 
 ### common
+
+replaceProperties () {
+  GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed 's/[\/&]/\\&/g')
+  GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL_ESCAPED | cut -f 1 -d '.')
+
+  replaceProperty $1 GIT_REPOSITORY_URL $GIT_REPOSITORY_URL_ESCAPED
+  replaceProperty $1 GIT_REPOSITORY_BASENAME
+  replaceProperty $1 PROJECT_NAME
+  replaceProperty $1 RELEASE_TRIGGER_BRANCH
+  replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
+  replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
+#  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_URL\)\(.*\)$/\1$GIT_REPOSITORY_URL_ESCAPED\3/" $1
+#  sed -i "s/^\(.*\)\(\$GIT_REPOSITORY_BASENAME\)\(.*\)$/\1$GIT_REPOSITORY_BASENAME\3/" $1
+#  sed -i "s/^\(.*\)\(\$PROJECT_NAME\)\(.*\)$/\1$PROJECT_NAME\3/" $1
+#  sed -i "s/^\(.*\)\(\$RELEASE_TRIGGER_BRANCH\)\(.*\)$/\1$RELEASE_TRIGGER_BRANCH\3/" $1
+#  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION_TAG\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION_TAG\3/" $1
+#  sed -i "s/^\(.*\)\(\$MAVEN_AUTO_RELEASER_VERSION\)\(.*\)$/\1$MAVEN_AUTO_RELEASER_VERSION\3/" $1
+}
+
+replaceProperty () {
+  if [ "$#" -lt 3 ]; then
+    PROPERTY_VALUE=${!2}
+  else
+    PROPERTY_VALUE=$3
+  fi
+  sed -i "s/^\(.*\)\(\$$2\)\(.*\)$/\1$PROPERTY_VALUE\3/" $1
+}
 
 # common command line parser to convert command line switch to variables
 # this will also set PARAMETERS variable with all command line arguments without switches
