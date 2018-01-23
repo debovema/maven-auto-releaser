@@ -1,5 +1,13 @@
 image: $DOCKER_IMAGE
 
+before_script:
+    # install ssh-agent
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    # run ssh-agent
+    - eval $(ssh-agent -s)
+    # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+
 release:
     stage:
         - release
@@ -9,7 +17,6 @@ release:
         - ls -la
         - git status
         - source ./release.sh
-        - executeRelease
-        - mvn -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION -Dmessage="[maven-release-plugin] [ci skip] Updating parent version" release:clean versions:update-parent scm:checkin release:prepare release:perform $MAVEN_RELEASE_ADDITIONAL_ARGS
+        - doRelease
     only:
         - $RELEASE_TRIGGER_BRANCH
