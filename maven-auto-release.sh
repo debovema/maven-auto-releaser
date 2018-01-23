@@ -107,7 +107,7 @@ createReleaseTriggerBranch () {
 
   # 5. push the release trigger branch
   echo "5. Pushing the created release trigger branch"
-  git push origin $RELEASE_TRIGGER_BRANCH -q
+  git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
 
   PUSH_BRANCH_RESULT=$?
   if [ $PUSH_BRANCH_RESULT -gt 0 ]; then
@@ -115,6 +115,8 @@ createReleaseTriggerBranch () {
     echo " Unable to create the release trigger branch"
     return 1
   fi
+
+  echo " Successfully pushed the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
 
   cleanUp
   return 0
@@ -351,7 +353,7 @@ executeRelease () {
     echo " Pushing to the release trigger branch";
     git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
     if [ $? -eq 0 ]; then
-      echo "Successfully pushed on the release trigger branch"
+      echo " Successfully pushed on the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
     fi
   fi
 
@@ -415,10 +417,9 @@ updateReleaseVersions () {
 ### common
 
 replaceProperties () {
-  GIT_REPOSITORY_URL_ESCAPED=$(echo $GIT_REPOSITORY_URL | sed 's/[\/&]/\\&/g')
-  GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL_ESCAPED | cut -f 1 -d '.')
+  GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL | cut -f 1 -d '.')
 
-  replaceProperty $1 GIT_REPOSITORY_URL $GIT_REPOSITORY_URL_ESCAPED
+  replaceProperty $1 GIT_REPOSITORY_URL
   replaceProperty $1 GIT_REPOSITORY_BASENAME
   replaceProperty $1 PROJECT_NAME
   replaceProperty $1 SOURCE_BRANCH
@@ -431,11 +432,9 @@ replaceProperties () {
 }
 
 replaceProperty () {
-  if [ "$#" -lt 3 ]; then
-    PROPERTY_VALUE=${!2}
-  else
-    PROPERTY_VALUE=$3
-  fi
+  unset PROPERTY_VALUE
+  PROPERTY_VALUE=${!2}
+  PROPERTY_VALUE=$(echo $PROPERTY_VALUE | sed 's/[\/&]/\\&/g') # escape slashes
   sed -i "s/^\(.*\)\(\$$2\)\(.*\)$/\1$PROPERTY_VALUE\3/" $1
 }
 
