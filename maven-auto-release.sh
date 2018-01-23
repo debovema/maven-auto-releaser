@@ -153,6 +153,7 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
 
   [ -f ./branch.properties ] && source ./branch.properties
 
+  displayBanner
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
   simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
@@ -244,6 +245,7 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
   [ -f ./branch.properties ] && source ./branch.properties
 
+  displayBanner
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
   simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
@@ -380,6 +382,7 @@ executeRelease_loadPropertiesFromFile () {
   # use release.properties (to retrieve Git user config and to override arguments default values)
   [ -f $0/release.properties ] && source $0/release.properties
 
+  displayBanner
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
   simpleConsoleLogger " using '$INCREMENT_POLICY' as increment policy" $NO_BANNER
@@ -475,7 +478,9 @@ parseCommandLine () {
   done
 
   PARAMETERS=$(echo $PARAMETERS | xargs)
+}
 
+displayBanner () {
   simpleConsoleLogger "Maven auto releaser v$MAVEN_AUTO_RELEASER_VERSION" $NO_BANNER
   simpleConsoleLogger " https://github.com/debovema/maven-auto-releaser/tree/$MAVEN_AUTO_RELEASER_VERSION_TAG" $NO_BANNER
 }
