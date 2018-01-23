@@ -150,7 +150,6 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
   GIT_USER_NAME="Auto Releaser"
   GIT_USER_EMAIL="auto@release.io"
   DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
-  GITLAB_CI_TAGS=""
 
   [ -f ./branch.properties ] && source ./branch.properties
 
@@ -426,9 +425,6 @@ updateReleaseVersions () {
 
 replaceProperties () {
   GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL | cut -f 1 -d '.')
-  if [ "$GITLAB_CI_TAGS" != "" ]; then
-    GITLAB_CI_TAGS="tags:\n        - $GITLAB_CI_TAGS"
-  fi
 
   replaceProperty $1 GIT_REPOSITORY_URL
   replaceProperty $1 GIT_REPOSITORY_BASENAME
@@ -438,7 +434,6 @@ replaceProperties () {
   replaceProperty $1 GIT_USER_NAME
   replaceProperty $1 GIT_USER_EMAIL
   replaceProperty $1 DOCKER_IMAGE
-  replaceProperty $1 GITLAB_CI_TAGS
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
 }

@@ -3,7 +3,8 @@ image: $DOCKER_IMAGE
 release:
     stage:
         - release
-    $GITLAB_CI_TAGS
+    tags:
+        - docker
     script:
         - ls -la
         - git status
