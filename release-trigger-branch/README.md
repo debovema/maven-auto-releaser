@@ -57,7 +57,7 @@ DEV_VERSION=0.0.2-SNAPSHOT && sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" 
 
 * commit the release information:
 ```shell
-git add release.properties && git commit -m "Triggering release $RELEASE_VERSION, next development version will be $DEV_VERSION""
+git add release.properties && git commit -m "Triggering release $RELEASE_VERSION, next development version will be $DEV_VERSION"
 ```
 
 * trigger the release by pushing to the *release trigger branch*:
