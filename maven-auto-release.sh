@@ -368,11 +368,14 @@ executeRelease_loadPropertiesFromFile () {
   unset RELEASE_VERSION DEV_VERSION GIT_USER_NAME GIT_USER_EMAIL GIT_REPOSITORY_URL INCREMENT_POLICY SOURCE_BRANCH RELEASE_TRIGGER_BRANCH
 
   if [ "$#" -lt 1 ]; then
-    echo " At least a Git repository URL is required" >&2
-    return 1
+    GIT_REPOSITORY_URL=$(git config --get remote.origin.url) # use remote URL of current repository (assuming remote is called origin)
+    if [ $? -ne 0 ]; then
+      echo " At least a Git repository URL is required" >&2
+      return 1
+    fi
+  else
+    GIT_REPOSITORY_URL=$1
   fi
-
-  GIT_REPOSITORY_URL=$1
 
   # default values
   INCREMENT_POLICY=revision
