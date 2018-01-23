@@ -380,7 +380,8 @@ executeRelease_loadPropertiesFromFile () {
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
 
   # use release.properties (to retrieve Git user config and to override arguments default values)
-  [ -f $0/release.properties ] && source $0/release.properties
+  RELEASE_PROPERTIES_FILE="$(dirname -- "$0")/release.properties"
+  [ -f $RELEASE_PROPERTIES_FILE ] && . $RELEASE_PROPERTIES_FILE
 
   displayBanner
   simpleConsoleLogger "" $NO_BANNER
