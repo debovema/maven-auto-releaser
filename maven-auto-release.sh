@@ -450,7 +450,8 @@ replaceProperty () {
 parseCommandLine () {
   unset OPTS NO_BANNER NO_COMMAND_LINE_OVERRIDE RELEASE_TRIGGER_BRANCH
 
-  [ -z ${JAVA_HOME+x} ] && echo "JAVA_HOME is not set!" && exit 1
+  [ -z ${JAVA_HOME+x} ] && JAVA_HOME=$(readlink -f /usr/bin/java | sed "s:/bin/java::")
+  [ ! -d "$JAVA_HOME" ] && echo "JAVA_HOME does not exist!" && exit 1
 
   OLDPWD1=`pwd`
 
