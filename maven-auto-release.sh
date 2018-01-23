@@ -337,25 +337,24 @@ executeRelease () {
 
   # 6. trigger the release by pushing the new file
   echo "6. Triggering the release"
-  git add release.properties && git commit -qm "Triggering release"
+  git add release.properties && git commit -qm "Triggering release" > /dev/null 2>&1
   COMMIT_RESULT=$?
+
   if [ $COMMIT_RESULT -gt 0 ]; then
     echo " A problem occurred while committing, not pushing anything"
-    if [ "$COMMIT_RESULT" == "128" ]; then
+    if [ $COMMIT_RESULT -eq 128 ]; then
       echo " You must set a Git user name and email"
     fi
   else
     echo " Pushing to the release trigger branch";
-    git push origin $RELEASE_TRIGGER_BRANCH -q
+    git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo "Successfully pushed on the release trigger branch"
+    fi
   fi
 
   # clean up and restore initial directory
-  echo
-  echo "== Clean up =="
-  cd $OLDPWD
-  echo " Removing temporary directory: $TEMP_CLONE_DIRECTORY"
-  rm -rf $TEMP_CLONE_DIRECTORY
-
+  cleanUp
   return 0
 }
 
