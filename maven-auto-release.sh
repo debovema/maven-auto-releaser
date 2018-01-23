@@ -341,7 +341,7 @@ executeRelease () {
 
   # 6. trigger the release by pushing the new file
   echo "6. Triggering the release"
-  git add release.properties && git commit -qm "Triggering release" > /dev/null 2>&1
+  git add release.properties && git commit -qm "Triggering release $RELEASE_VERSION, next development version will be $DEV_VERSION" > /dev/null 2>&1
   COMMIT_RESULT=$?
 
   if [ $COMMIT_RESULT -gt 0 ]; then
