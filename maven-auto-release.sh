@@ -131,7 +131,7 @@ createReleaseTriggerBranch_usage () {
 }
 
 createReleaseTriggerBranch_loadPropertiesFromFile () {
-  unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH SOURCE_BRANCH GIT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_REPOSITORY_URL GIT_PARENT_PARENT_PARENT_REPOSITORY_URL
+  unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH SOURCE_BRANCH GIT_USER_NAME GIT_USER_EMAIL
 
   if [ "$#" -lt 1 ]; then
     echo
@@ -144,6 +144,8 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
   # default values
   SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+  GIT_USER_NAME="Auto Releaser"
+  GIT_USER_EMAIL="auto@release.io"
 
   [ -f ./branch.properties ] && source ./branch.properties
 
@@ -151,9 +153,6 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
   simpleConsoleLogger "Arguments:" $NO_BANNER
   simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
   simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
-#  simpleConsoleLogger " using '$GIT_PARENT_REPOSITORY_URL' as parent repository URL" $NO_BANNER
-#  simpleConsoleLogger " using '$GIT_PARENT_PARENT_REPOSITORY_URL' as great parent repository URL" $NO_BANNER
-#  simpleConsoleLogger " using '$GIT_PARENT_PARENT_PARENT_REPOSITORY_URL' as great great parent repository URL" $NO_BANNER
 }
 
 # try to guess project name from repository name or POM if it exists (it should exist!)
