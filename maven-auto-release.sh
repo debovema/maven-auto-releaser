@@ -274,7 +274,9 @@ executeRelease () {
   git status
   ls -la
 
-  mvn -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION -Dmessage="[maven-release-plugin] [ci skip] Updating parent version" release:clean versions:update-parent scm:checkin release:prepare release:perform
+#  mvn -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION -Dmessage="[maven-release-plugin] [ci skip] Updating parent version" release:clean versions:update-parent scm:checkin release:prepare release:perform
+
+  mvn unleash:perform -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION
 
   return 0
 }
