@@ -254,7 +254,7 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
 ### release triggering ###
 
-# the executeRelease function will:
+# the triggerRelease function will:
 #  1. clone a repository
 #  2. checkout the source branch (DEFAULT_SOURCE_BRANCH=master by default)
 #  3. retrieve the next release and snapshot versions with the provided "increment policy" considering the current versions in the checked out branch
@@ -263,10 +263,10 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 #  6. add, commit & push the changed release properties file (this will trigger the release for the project in the repository)
 #
 # arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
-executeRelease () {
+triggerRelease () {
   parseCommandLine $@
 
-  executeRelease_loadPropertiesFromFile $PARAMETERS
+  triggerRelease_loadPropertiesFromFile $PARAMETERS
 
   if [ $? -gt 0 ]; then
     cleanUp
@@ -364,7 +364,7 @@ executeRelease () {
   return 0
 }
 
-executeRelease_loadPropertiesFromFile () {
+triggerRelease_loadPropertiesFromFile () {
   unset RELEASE_VERSION DEV_VERSION GIT_USER_NAME GIT_USER_EMAIL GIT_REPOSITORY_URL INCREMENT_POLICY SOURCE_BRANCH RELEASE_TRIGGER_BRANCH
 
   if [ "$#" -lt 1 ]; then
