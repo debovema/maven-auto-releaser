@@ -255,10 +255,13 @@ prepareRelease () {
   # source release.properties
   [ -f ./release.properties ] && source ./release.properties
 
+  SSH_GIT_URL=$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')
+  git remote set-url origin ssh://$SSH_GIT_URL
+
   # configure repository and checkout $SOURCE_BRANCH instead of current release branch
-  git config --global user.name $GIT_USER_NAME
-  git config --global user.email $GIT_USER_EMAIL
-  git config --global push.default upstream
+  git config user.name $GIT_USER_NAME
+  git config user.email $GIT_USER_EMAIL
+  git config push.default upstream
 
   # delete the branch and check it out again from remote
   git branch -d $SOURCE_BRANCH
