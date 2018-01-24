@@ -5,5 +5,5 @@ wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AU
 chmod u+x /tmp/maven-auto-release.sh
 . /tmp/maven-auto-release.sh
 
-# call executeRelease from Maven auto release script
-executeRelease $GIT_REPOSITORY_URL
+# call triggerRelease from Maven auto release script
+triggerRelease $GIT_REPOSITORY_URL
