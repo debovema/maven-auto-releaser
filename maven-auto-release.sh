@@ -123,7 +123,7 @@ createReleaseTriggerBranch () {
 }
 
 copyFileFromToReleaseTriggerBranch  () {
-  wget -q https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/$FILE_TO_COPY -O ./$FILE_TO_COPY &&
+  curl -s https://raw.githubusercontent.com/debovema/maven-auto-releaser/$MAVEN_AUTO_RELEASER_VERSION_TAG/release-trigger-branch/$FILE_TO_COPY -o ./$FILE_TO_COPY &&
   replaceProperties ./$FILE_TO_COPY &&
   git add ./$FILE_TO_COPY
 }
@@ -253,6 +253,11 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
 
 ### release triggering ###
+
+prepareRelease () {
+  echo "Preparing release"
+  return 0
+}
 
 executeRelease () {
   echo "Executing release"

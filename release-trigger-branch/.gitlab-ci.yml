@@ -9,18 +9,30 @@ before_script:
   - eval $(ssh-agent -s)
   # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
-
+  # disable host key checking (on Docker runners only)
+  - '[[ -f /.dockerenv ]] && mkdir -p ~/.ssh && touch ~/.ssh/config && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  # source maven-auto-releaser script
+  - source ./release.sh
+ 
 stages:
   - release
+
+prepare-release:
+  stage: release
+  tags:
+    - docker
+  script:
+    # call prepareRelease from maven-auto-releaser script
+    - prepareRelease
+  only:
+    - $RELEASE_TRIGGER_BRANCH
 
 release:
   stage: release
   tags:
     - docker
   script:
-    - ls -la
-    - git status
-    - source ./release.sh
-    - doRelease
+    # call executeRelease from maven-auto-releaser script
+    - executeRelease
   only:
     - $RELEASE_TRIGGER_BRANCH
