@@ -254,6 +254,11 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
 ### release triggering ###
 
+executeRelease () {
+  echo "Executing release"
+  return 0
+}
+
 # the triggerRelease function will:
 #  1. clone a repository
 #  2. checkout the source branch (DEFAULT_SOURCE_BRANCH=master by default)
