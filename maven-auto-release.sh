@@ -97,9 +97,6 @@ createReleaseTriggerBranch () {
   # release.sh
     FILE_TO_COPY=release.sh
     copyFileFromToReleaseTriggerBranch  
-  # prepare-release.sh
-    FILE_TO_COPY=prepare-release.sh
-    copyFileFromToReleaseTriggerBranch  
   # release.properties
     FILE_TO_COPY=release.properties
     copyFileFromToReleaseTriggerBranch  

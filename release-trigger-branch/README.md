@@ -27,7 +27,7 @@ git checkout $RELEASE_TRIGGER_BRANCH
 * simply run:
 ```shell
 chmod u+x ./release.sh
-./release.sh
+. ./release.sh && triggerRelease
 ```
 
 This script will update the [*release.properties*](./release.properties) file with next versions (based on ```INCREMENT_POLICY``` set in [*release.properties*](./release.properties)) then commit and push this file on this *release trigger branch*, hence triggering a release.
