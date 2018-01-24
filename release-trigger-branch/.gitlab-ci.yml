@@ -2,7 +2,7 @@ image: $DOCKER_IMAGE
 
 before_script:
   # install ssh-agent
-  - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+  - 'which ssh-agent || ( $SSH_AGENT_INSTALL )'
   # run ssh-agent
   - eval $(ssh-agent -s)
   # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store

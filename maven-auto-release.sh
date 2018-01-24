@@ -9,6 +9,7 @@ MAVEN_AUTO_RELEASER_VERSION_TAG=master #v$MAVEN_AUTO_RELEASER_VERSION # this is 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 DEFAULT_SOURCE_BRANCH=master
 DEFAULT_DOCKER_IMAGE=debovema/docker-mvn
+DEFAULT_SSH_AGENT_INSTALL="apt-get update -y && apt-get install openssh-client -y"
 
 ### release trigger branch creation ###
 
@@ -150,6 +151,7 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
   GIT_USER_NAME="Auto Releaser"
   GIT_USER_EMAIL="auto@release.io"
   DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
+  SSH_AGENT_INSTALL=$DEFAULT_SSH_AGENT_INSTALL
 
   [ -f ./branch.properties ] && source ./branch.properties
 
@@ -439,6 +441,7 @@ replaceProperties () {
   replaceProperty $1 GIT_USER_NAME
   replaceProperty $1 GIT_USER_EMAIL
   replaceProperty $1 DOCKER_IMAGE
+  replaceProperty $1 SSH_AGENT_INSTALL
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
 }
