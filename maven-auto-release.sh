@@ -9,6 +9,9 @@ MAVEN_AUTO_RELEASER_VERSION_TAG=master #v$MAVEN_AUTO_RELEASER_VERSION # this is 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 DEFAULT_SOURCE_BRANCH=master
 DEFAULT_DOCKER_IMAGE=debovema/docker-mvn
+DEFAULT_GIT_USER_NAME="Auto Releaser"
+DEFAULT_GIT_USER_EMAIL="auto@release.io"
+DEFAULT_INCREMENT_POLICY=revision
 
 ### release trigger branch creation ###
 
@@ -144,12 +147,7 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
 
   GIT_REPOSITORY_URL=$1
 
-  # default values
-  SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
-  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
-  GIT_USER_NAME="Auto Releaser"
-  GIT_USER_EMAIL="auto@release.io"
-  DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
+  defaultValues 
 
   [ -f ./branch.properties ] && source ./branch.properties
 
@@ -240,8 +238,7 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
   GIT_REPOSITORY_URL=$1
 
-  # default values
-  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+  defaultValues 
 
   [ -f ./branch.properties ] && source ./branch.properties
 
@@ -255,7 +252,19 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 ### release triggering ###
 
 prepareRelease () {
-  echo "Preparing release"
+  # source release.properties
+  [ -f ./release.properties ] && source ./release.properties
+
+  # configure repository and checkout $SOURCE_BRANCH instead of current release branch
+  git config --global user.name $GIT_USER_NAME
+  git config --global user.email $GIT_USER_EMAIL
+  git config --global push.default upstream
+
+  # delete the branch and check it out again from remote
+  git branch -d $SOURCE_BRANCH
+  git checkout -b $SOURCE_BRANCH remotes/origin/$SOURCE_BRANCH
+  git branch --set-upstream-to=origin/$SOURCE_BRANCH $SOURCE_BRANCH
+
   return 0
 }
 
@@ -387,10 +396,7 @@ triggerRelease_loadPropertiesFromFile () {
     GIT_REPOSITORY_URL=$1
   fi
 
-  # default values
-  INCREMENT_POLICY=revision
-  SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
-  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+  defaultValues
 
   # use release.properties (to retrieve Git user config and to override arguments default values)
   RELEASE_PROPERTIES_FILE="$(dirname -- "$0")/release.properties"
@@ -493,6 +499,16 @@ parseCommandLine () {
   done
 
   PARAMETERS=$(echo $PARAMETERS | xargs)
+}
+
+defaultValues () {
+  # default values
+  SOURCE_BRANCH=$DEFAULT_SOURCE_BRANCH
+  RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
+  GIT_USER_NAME=$DEFAULT_GIT_USER_NAME
+  GIT_USER_EMAIL=$DEFAULT_GIT_USER_EMAIL
+  DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
+  INCREMENT_POLICY=$DEFAULT_INCREMENT_POLICY
 }
 
 displayBanner () {

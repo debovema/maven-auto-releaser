@@ -15,10 +15,11 @@ before_script:
   - source ./release.sh
  
 stages:
+  - prepare
   - release
 
 prepare-release:
-  stage: release
+  stage: prepare
   tags:
     - docker
   script:
