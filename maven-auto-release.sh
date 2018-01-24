@@ -12,6 +12,7 @@ DEFAULT_DOCKER_IMAGE=debovema/docker-mvn
 DEFAULT_GIT_USER_NAME="Auto Releaser"
 DEFAULT_GIT_USER_EMAIL="auto@release.io"
 DEFAULT_INCREMENT_POLICY=revision
+DEFAULT_MAVEN_RELEASER=unleash
 
 ### release trigger branch creation ###
 
@@ -272,14 +273,9 @@ prepareRelease () {
 }
 
 executeRelease () {
-  echo "Executing release"
-
-  git status
-  ls -la
-
 #  mvn -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION -Dmessage="[maven-release-plugin] [ci skip] Updating parent version" release:clean versions:update-parent scm:checkin release:prepare release:perform
 
-  mvn unleash:perform -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION
+  mvn unleash:perform -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION
 
   return 0
 }
@@ -520,6 +516,7 @@ defaultValues () {
   GIT_USER_EMAIL=$DEFAULT_GIT_USER_EMAIL
   DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
   INCREMENT_POLICY=$DEFAULT_INCREMENT_POLICY
+  MAVEN_RELEASER=$DEFAULT_MAVEN_RELEASER
 }
 
 displayBanner () {
