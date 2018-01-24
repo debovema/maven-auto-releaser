@@ -11,28 +11,19 @@ before_script:
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
   # disable host key checking (on Docker runners only)
   - '[[ -f /.dockerenv ]] && mkdir -p ~/.ssh && touch ~/.ssh/config && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-  # source maven-auto-releaser script
-  - source ./release.sh
- 
-stages:
-  - prepare
-  - release
 
-prepare-release:
-  stage: prepare
-  tags:
-    - docker
-  script:
-    # call prepareRelease from maven-auto-releaser script
-    - prepareRelease
-  only:
-    - $RELEASE_TRIGGER_BRANCH
+stages:
+  - release
 
 release:
   stage: release
   tags:
     - docker
   script:
+    # source maven-auto-releaser script
+    - source ./release.sh
+    # call prepareRelease from maven-auto-releaser script
+    - prepareRelease
     # call executeRelease from maven-auto-releaser script
     - executeRelease
   only:
