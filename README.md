@@ -2,7 +2,7 @@
 
 ## What it does
 
-The **Maven auto releaser** is a tool to automate the release process of large and complex Maven projects — especially those with a multi-level hierarchy — using Git as their Source Code Management tool.
+The **Maven auto releaser** is a tool to automate the release process of Maven projects using Git as their Source Code Management tool.
 
 ## How it works?
 
@@ -31,7 +31,11 @@ Main advantage is that it is easy to update to the latest version of the **Maven
 * **local mode** will copy the content of scripts at their current version from this repository (https://github.com/debovema/maven-auto-releaser) during the **creation step**.
 Main advantage is that the repositories with *release trigger branches* does not rely on the **Maven auto releaser** tool once they have been initialized (especially if release environment has no access to the Internet). On the other hand, the **Maven auto releaser** tool becomes ***very hard to update in this mode***.
 
-### List of supported properties in *release.properties*
+### Properties configuration
+
+There are two properties file used by the **Maven auto releaser**: *branch.properties* and *release.properties*.
+
+#### List of supported properties in *release.properties*
 
 | Property                 | Description                                                 | Example            |
 |--------------------------|-------------------------------------------------------------|--------------------|
@@ -50,8 +54,8 @@ Currently, only Gitlab CI is supported, though adding other Continuous Integrati
 #### Gitlab CI requirements
 
 * Gitlab & Gitlab CI installed
-* The Gitlab CI runner used to execute release jobs must be able to clone and push from and to the repositories of the projects to release (with SSH keys)
-* Only one Gitlab CI runner must be running at a time: either have only one runner or assign all the projects to be released to the same runner
+* Only Docker Gitlab runners are supported (at the moment)
+* A Docker image with following packages installed: cUrl, Bash, Git, OpenSSH client, Java, Maven
 
 ## Getting started
 
@@ -73,7 +77,7 @@ cd maven-auto-releaser
 git checkout $(git describe --tags)
 ```
 
-4. create a release trigger branch on the repositories
+4. create a release trigger branch on a Git repository
 
 ```shell
 GIT_REPOSITORY_URL=<URL of the Git repository> bash -c 'source ./maven-auto-release.sh && createReleaseTriggerBranch $GIT_REPOSITORY_URL'
@@ -83,5 +87,4 @@ GIT_REPOSITORY_URL=<URL of the Git repository> bash -c 'source ./maven-auto-rele
 
 ## Licensing
 
-The Maven auto releaser tool is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/debovema/maven-auto-releaser/blob/master/LICENSE) for the full license text.
-
+The **Maven auto releaser** tool is licensed under the Apache License, Version 2.0. See [LICENSE](https://github.com/debovema/maven-auto-releaser/blob/master/LICENSE) for the full license text.
