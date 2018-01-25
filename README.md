@@ -18,8 +18,8 @@ The main idea behind the *release trigger branch* concept is to create a Git bra
 This branch will be composed of:
 * a Continuous Integration configuration file (for Gitlab CI, it's the *.gitlab-cy.yml*). In this file, a trigger is set to be executed **whenever a commit is pushed on the _release trigger branch_**.
 * a *release.properties* file with information for the next version to be released.
-* a preparation script, *prepareRelease.sh*, called by the Continuous Integration trigger. It will clone the repository and checkout the source branch and configure Git with username and email.
 * an execution script, *release.sh*, called by the Continuous Integration trigger. It will execute the actual release Maven build.
+* a *README.md* file with built-in help to guide end-users in the release process of their Maven projects
 
 ### Remote vs Standalone mode
 
