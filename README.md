@@ -2,9 +2,9 @@
 
 ## What it does
 
-The **Maven auto releaser** is a tool to automate the release process of Maven projects using Git as their Source Code Management tool.
+The **Maven auto releaser** is a release engineering tool to automate the release process of Maven projects using Git as their Source Code Management tool and Gitlab CI for Continuous Integration builds.
 
-## How it works?
+## How it works
 
 This tool is composed of **two parts**:
 
@@ -29,11 +29,25 @@ The difference between the two modes are:
 * in **remote mode** the [**creation step**](#how-it-works) will only write links to the actual scripts which will be downloaded from this repository (https://github.com/debovema/maven-auto-releaser) by the **execution runtime** based on the version used during the **creation step**.
 Main advantage is that it is easy to update to the latest version of the **Maven auto releaser** tool by changing the version in the existing *release trigger branches* of your repositories.
 * **local mode** will copy the content of scripts at their current version from this repository (https://github.com/debovema/maven-auto-releaser) during the **creation step**.
-Main advantage is that the repositories with *release trigger branches* does not rely on the **Maven auto releaser** tool once they have been initialized (especially if release environment has no access to the Internet). On the other hand, the **Maven auto releaser** tool becomes ***very hard to update in this mode***.
+Main advantage is that the repositories with *release trigger branches* does not rely on the **Maven auto releaser** tool once they have been initialized (especially if release environment has no access to the Internet). On the other hand, the **Maven auto releaser** tool becomes ***harder to update in this mode***.
 
 ### Properties configuration
 
-There are two properties file used by the **Maven auto releaser**: *branch.properties* and *release.properties*.
+There are two properties file used by the **Maven auto releaser**: *branch.properties* and *release.properties*:
+* *branch.properties* is used to provide parameters for the *release trigger branch* creation step. It is expected to be created in the same directory as the *maven-auto-release.sh* script.
+* *release.properties* is used to provide parameters for the trigger and execution of releases. It is stored directly on the *release trigger branch*. To edit this file without triggering release, **add the [ci skip] prefix in the commit message** before pushing.
+
+#### List of supported properties in *branch.properties*
+
+| Property                 | Description                                                 | Example            |
+|--------------------------|-------------------------------------------------------------|--------------------|
+| DEV\_VERSION             | The next development version                                | 1.0.2-SNAPSHOT     |
+| RELEASE\_VERSION         | The next release version                                    | 1.0.1              |
+| GIT\_USER\_NAME          | Value of git config user.name                               | "John Doe"         |
+| GIT\_USER\_EMAIL         | Value of git config user.email                              | john.doe@gmail.com |
+| INCREMENT\_POLICY        | The increment policy. Values can be: revision, minor, major | revision           |
+| SOURCE\_BRANCH           | The branch to checkout to initiate releases                 | master             |
+| RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases         | release-trigger    |
 
 #### List of supported properties in *release.properties*
 
