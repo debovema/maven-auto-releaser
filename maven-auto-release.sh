@@ -4,7 +4,7 @@
 # released by Mathieu Debove (https://github.com/debovema) under Apache License, Version 2.0
 
 MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta4 # this is the displayed version (in banner)
-MAVEN_AUTO_RELEASER_VERSION_TAG=v1.0.0-beta4 #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
+MAVEN_AUTO_RELEASER_VERSION_TAG=master #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 DEFAULT_SOURCE_BRANCH=master
@@ -251,6 +251,8 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 ### release triggering ###
 
 prepareRelease () {
+  defaultValues
+
   # source release.properties
   [ -f ./release.properties ] && source ./release.properties
 
@@ -271,6 +273,11 @@ prepareRelease () {
 }
 
 executeRelease () {
+  defaultValues
+
+  # source release.properties
+  [ -f ./release.properties ] && source ./release.properties
+
   case "$MAVEN_RELEASER" in
     "unleash")
       echo " Executing release build using unleash-maven-plugin releaser."
