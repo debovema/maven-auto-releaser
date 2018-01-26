@@ -93,7 +93,7 @@ cd maven-auto-releaser
 git checkout $(git describe --tags)
 ```
 
-4. edit the *branch.properties* file according to 
+4. edit the *branch.properties* file with properties to set
 
 5. create a release trigger branch on a Git repository
 
