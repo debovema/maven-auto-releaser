@@ -23,10 +23,10 @@ This branch will be composed of:
 
 ### Remote vs Standalone mode
 
-The preparation and execution scripts above (*prepareRelease.sh* and *release.sh*) always exist in the *release trigger branch*.
+The content of *release.sh* file of the *release trigger branch* differs whether the **remote mode** or **local mode** is selected during the [**creation step**](#how-it-works).
 
 The difference between the two modes are:
-* in **remote mode** the [**creation step**](#how-it-works) will only write links to the actual scripts which will be downloaded from this repository (https://github.com/debovema/maven-auto-releaser) by the **execution runtime** based on the version used during the **creation step**.
+* in **remote mode** the **creation step** will only write links to the actual scripts which will be downloaded from this repository (https://github.com/debovema/maven-auto-releaser) by the **execution runtime** based on the version used during the **creation step**.
 Main advantage is that it is easy to update to the latest version of the **Maven auto releaser** tool by changing the version in the existing *release trigger branches* of your repositories.
 * **local mode** will copy the content of scripts at their current version from this repository (https://github.com/debovema/maven-auto-releaser) during the **creation step**.
 Main advantage is that the repositories with *release trigger branches* does not rely on the **Maven auto releaser** tool once they have been initialized (especially if release environment has no access to the Internet). On the other hand, the **Maven auto releaser** tool becomes ***harder to update in this mode***.
