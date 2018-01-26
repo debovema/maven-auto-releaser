@@ -13,6 +13,7 @@ DEFAULT_GIT_USER_NAME="Auto Releaser"
 DEFAULT_GIT_USER_EMAIL="auto@release.io"
 DEFAULT_INCREMENT_POLICY=revision
 DEFAULT_MAVEN_RELEASER=unleash
+DEFAULT_MODE_SCRIPT_CONTENT=remote
 
 ### release trigger branch creation ###
 
@@ -270,9 +271,20 @@ prepareRelease () {
 }
 
 executeRelease () {
-#  mvn -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION -Dmessage="[maven-release-plugin] [ci skip] Updating parent version" release:clean versions:update-parent scm:checkin release:prepare release:perform
-
-  mvn unleash:perform -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION
+  case "$MAVEN_RELEASER" in
+    "unleash")
+      echo " Executing release build using unleash-maven-plugin releaser."
+      mvn unleash:perform -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION
+    ;;
+    "maven")
+      echo " Executing release build using unleash-maven-plugin releaser."
+      mvn release:prepare release:perform -DdevelopmentVersion=$DEV_VERSION -DreleaseVersion=$RELEASE_VERSION
+    ;;
+    *)
+      echo "The releaser '$MAVEN_RELEASER' is not 'unleash' or 'maven'."
+      return 1
+    ;;
+  esac
 
   return 0
 }
@@ -514,6 +526,7 @@ defaultValues () {
   DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
   INCREMENT_POLICY=$DEFAULT_INCREMENT_POLICY
   MAVEN_RELEASER=$DEFAULT_MAVEN_RELEASER
+  MODE_SCRIPT_CONTENT=$DEFAULT_MODE_SCRIPT_CONTENT
 }
 
 displayBanner () {
