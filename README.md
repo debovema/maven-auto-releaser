@@ -39,15 +39,15 @@ There are two properties file used by the **Maven auto releaser**: *branch.prope
 
 #### List of supported properties in *branch.properties*
 
-| Property                 | Description                                                 | Example            |
-|--------------------------|-------------------------------------------------------------|--------------------|
-| DEV\_VERSION             | The next development version                                | 1.0.2-SNAPSHOT     |
-| RELEASE\_VERSION         | The next release version                                    | 1.0.1              |
-| GIT\_USER\_NAME          | Value of git config user.name                               | "John Doe"         |
-| GIT\_USER\_EMAIL         | Value of git config user.email                              | john.doe@gmail.com |
-| INCREMENT\_POLICY        | The increment policy. Values can be: revision, minor, major | revision           |
-| SOURCE\_BRANCH           | The branch to checkout to initiate releases                 | master             |
-| RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases         | release-trigger    |
+| Property                 | Description                                                                                             | Default value       |
+|--------------------------|---------------------------------------------------------------------------------------------------------|---------------------|
+| DOCKER\_IMAGE            | The Docker image for Gitlab CI builds to be set in *release.properties*                                 | debovema/docker-mvn |
+| GIT\_USER\_NAME          | Value of git config user.name to be set in *release.properties*                                         | "Auto releaser"     |
+| GIT\_USER\_EMAIL         | Value of git config user.email to be set in *release.properties*                                        | auto@release.io     |
+| INCREMENT\_POLICY        | The increment policy to be set in *release.properties*. <br />Values can be: revision, minor, major     | revision            |
+| MAVEN\_RELEASER          | The Maven plugin used to release to be set in *release.properties*. <br />Values can be: maven, unleash | unleash             |
+| RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases to be set in *release.properties*                   | release-trigger     |
+| SOURCE\_BRANCH           | The branch to checkout to initiate releases to be set in *release.properties*                           | master              |
 
 #### List of supported properties in *release.properties*
 
