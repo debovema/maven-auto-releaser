@@ -46,6 +46,7 @@ There are two properties file used by the **Maven auto releaser**: *branch.prope
 | GIT\_USER\_NAME          | Value of git config user.name to be set in *release.properties*                                         | "Auto releaser"     |
 | INCREMENT\_POLICY        | The increment policy to be set in *release.properties*. <br />Values can be: revision, minor, major     | revision            |
 | MAVEN\_RELEASER          | The Maven plugin used to release to be set in *release.properties*. <br />Values can be: maven, unleash | unleash             |
+| MODE_SCRIPT_CONTENT      | The mode for script content. <br />Values can be: remote, local                                         | remote              |
 | RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases to be set in *release.properties*                   | release-trigger     |
 | SOURCE\_BRANCH           | The branch to checkout to initiate releases to be set in *release.properties*                           | master              |
 
@@ -92,13 +93,15 @@ cd maven-auto-releaser
 git checkout $(git describe --tags)
 ```
 
-4. create a release trigger branch on a Git repository
+4. edit the *branch.properties* file according to 
+
+5. create a release trigger branch on a Git repository
 
 ```shell
 GIT_REPOSITORY_URL=<URL of the Git repository> bash -c 'source ./maven-auto-release.sh && createReleaseTriggerBranch $GIT_REPOSITORY_URL'
 ```
 
-5. follow the instructions of the README file created on the release trigger branch of the Git repository
+6. follow the instructions of the README file created on the release trigger branch of the Git repository
 
 ## Licensing
 
