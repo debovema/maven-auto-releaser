@@ -271,7 +271,7 @@ initCI () {
 }
 
 tagRelease () {
-  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')
+  GIT_REPOSITORY_URL="ssh://$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')"
 
   defaultValues
 
