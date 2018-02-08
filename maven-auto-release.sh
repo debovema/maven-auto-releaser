@@ -308,6 +308,15 @@ tagRelease () {
     return 1
   fi
 
+  # create a new temporary branch from the release trigger branch
+  git checkout -qb $RELEASE_TRIGGER_BRANCH-tmp
+  if [ $? -gt 0 ]; then
+    echo
+    echo " Unable to checkout to $RELEASE_TRIGGER_BRANCH-tmp branch"
+    cleanUp
+    return 1
+  fi
+
   # 2. update the release commit SHA
   echo "2. Updating release commit SHA"
   # replace the release commit SHA in release.properties file 
@@ -327,7 +336,7 @@ tagRelease () {
 
   # 3. create a commit with modified release.properties file (with "[ci skip]" switch)
   echo "3. Commiting the new release commit SHA"
-  git add release.properties && git commit -qm "[ci skip] Tag trigger for release version $RELEASE_VERSION" > /dev/null 2>&1
+  git add release.properties && git commit -qm "Tag trigger for release version $RELEASE_VERSION" > /dev/null 2>&1
   COMMIT_RESULT=$?
 
   if [ $COMMIT_RESULT -gt 0 ]; then
@@ -337,7 +346,7 @@ tagRelease () {
     fi
 	return 1
   else
-    git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
+    git push origin $RELEASE_TRIGGER_BRANCH --follow-tags -q > /dev/null 2>&1
     if [ $? -eq 0 ]; then
       echo " Successfully pushed the new release commit SHA"
     fi
@@ -352,7 +361,23 @@ tagRelease () {
     echo " A problem occurred while tagging, not pushing"
 	return 1
   fi
-  git push origin $TAG_TRIGGER -q > /dev/null 2>&1
+
+  echo
+  # 5. push the commit and the tag
+  echo "5. Pushing the trigger tag: $TAG_TRIGGER"
+
+  git push origin $RELEASE_TRIGGER_BRANCH --follow-tags -q > /dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    echo " Successfully pushed the new release commit SHA"
+  fi
+
+  # delete temporary branch
+  git push -q --delete origin $RELEASE_TRIGGER_BRANCH-tmp # TODO: what if remote name is not origin ?
+  if [ $? -gt 0 ]; then
+    echo " Unable to delete $RELEASE_TRIGGER_BRANCH-tmp branch"
+    cleanUp
+    return 1
+  fi
 
   # clean up and restore initial directory
   cleanUp
