@@ -277,6 +277,11 @@ tagRelease () {
 
   [ -f ./release.properties ] && source ./release.properties
 
+  # get SHA of the latest commit of the source branch
+  RELEASE_COMMIT_SHA=$(git rev-parse $SOURCE_BRANCH)
+  # generate the tag trigger name composed of the release trigger branch, the version to be released, the SHA of the latest commit of the source branch
+  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
+ 
   echo
   echo "Creating a trigger tag in $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH, trigger tag will be $TAG_TRIGGER"
   echo
@@ -305,11 +310,6 @@ tagRelease () {
 
   # 2. update the release commit SHA
   echo "2. Updating release commit SHA"
-  # get SHA of the latest commit of the source branch
-  RELEASE_COMMIT_SHA=$(git rev-parse $SOURCE_BRANCH)
-  # generate the tag trigger name composed of the release trigger branch, the version to be released, the SHA of the latest commit of the source branch
-  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
-
   # replace the release commit SHA in release.properties file 
   sed -i "s|RELEASE_COMMIT_SHA=.*|RELEASE_COMMIT_SHA=$RELEASE_COMMIT_SHA|" release.properties
 
@@ -322,6 +322,8 @@ tagRelease () {
     cleanUp
     return 1
   fi
+
+  git status
 
   # 3. create a commit with modified release.properties file (with "[ci skip]" switch)
   echo "3. Commiting the new release commit SHA"
