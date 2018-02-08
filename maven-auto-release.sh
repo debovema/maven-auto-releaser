@@ -332,8 +332,6 @@ tagRelease () {
     return 1
   fi
 
-  git status
-
   # 3. create a commit with modified release.properties file (with "[ci skip]" switch)
   echo "3. Commiting the new release commit SHA"
   git add release.properties && git commit -qm "Tag trigger for release version $RELEASE_VERSION" > /dev/null 2>&1
@@ -345,18 +343,13 @@ tagRelease () {
       echo " You must set a Git user name and email"
     fi
 	return 1
-  else
-    git push origin $RELEASE_TRIGGER_BRANCH --follow-tags -q > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      echo " Successfully pushed the new release commit SHA"
-    fi
   fi
 
   echo
   echo "== Tag trigger creation =="
   # 4. create the tag rigger
   echo "4. Creating the tag trigger: $TAG_TRIGGER"
-  git tag -a $TAG_TRIGGER -m "Creating tag trigger $TAG_TRIGGER"
+  git tag -a $TAG_TRIGGER -m "Creating tag trigger '$TAG_TRIGGER' from '$RELEASE_COMMIT_SHA' commit"
   if [ $COMMIT_RESULT -gt 0 ]; then
     echo " A problem occurred while tagging, not pushing"
 	return 1
@@ -368,7 +361,7 @@ tagRelease () {
 
   git push origin $RELEASE_TRIGGER_BRANCH --follow-tags -q > /dev/null 2>&1
   if [ $? -eq 0 ]; then
-    echo " Successfully pushed the new release commit SHA"
+    echo " Successfully pushed the new release commit SHA 'RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
   fi
 
   # delete temporary branch
