@@ -359,9 +359,9 @@ tagRelease () {
   # 5. push the commit and the tag
   echo "5. Pushing the trigger tag: $TAG_TRIGGER"
 
-  git push origin $RELEASE_TRIGGER_BRANCH-tmp --follow-tags -q > /dev/null 2>&1
+  git push origin $RELEASE_TRIGGER_BRANCH-tmp --follow-tags # -q > /dev/null 2>&1
   if [ $? -eq 0 ]; then
-    echo " Successfully pushed the new release commit SHA 'RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
+    echo " Successfully pushed the new release commit SHA '$RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
   fi
 
   # delete temporary branch
