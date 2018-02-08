@@ -253,18 +253,18 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 initCI () {
   # check git exists
   echo "Checking Git..."
-  which git || ( echo "git executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
+  which git > /dev/null 2>&1 || ( echo "git executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
   echo "Checked  Git"
   # check ssh-agent exists
   echo "Checking SSH Agent"
-  which ssh-agent || ( echo "ssh-agent executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
+  which ssh-agent > /dev/null 2>&1 || ( echo "ssh-agent executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
   echo "Checked  SSH Agent"
   # run ssh-agent
   echo "Launching an SSH agent"
-  eval $(ssh-agent -s)
+  eval $(ssh-agent -s) > /dev/null
   # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
   echo "Adding SSH private key..."
-  ssh-add <(echo "$SSH_PRIVATE_KEY")
+  ssh-add <(echo "$SSH_PRIVATE_KEY") > /dev/null
   echo "Added  SSH private key"
   # disable host key checking (on Docker runners only)
   [[ -f /.dockerenv ]] && mkdir -p ~/.ssh && touch ~/.ssh/config && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
@@ -359,7 +359,7 @@ tagRelease () {
   # 5. push the commit and the tag
   echo "5. Pushing the trigger tag: $TAG_TRIGGER"
 
-  git push origin $RELEASE_TRIGGER_BRANCH-tmp --follow-tags # -q > /dev/null 2>&1
+  git push origin $RELEASE_TRIGGER_BRANCH-tmp --follow-tags -q > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo " Successfully pushed the new release commit SHA '$RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
   fi

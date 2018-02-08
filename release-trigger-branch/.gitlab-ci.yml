@@ -13,7 +13,7 @@ tag-release:
     - docker
   script:
     # source maven-auto-releaser script
-    - source ./release.sh
+    # - source ./release.sh
     # call tagRelease from maven-auto-releaser script
     - tagRelease
   only:
@@ -25,7 +25,7 @@ release:
     - docker
   script:
     # source maven-auto-releaser script
-    - source ./release.sh
+    # - source ./release.sh
     # call prepareRelease from maven-auto-releaser script
     - prepareRelease
     # call executeRelease from maven-auto-releaser script
