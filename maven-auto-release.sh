@@ -248,8 +248,14 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 }
 
 
-### release triggering ###
+### release triggering runtime ###
 
+# the initCI function will:
+#  1. check that Git is installed
+#  2. check that SSH Agent is installed
+#  3. launch an SSH Agent
+#  4. add the provided private key to the SSH Agent
+#  5. disable StrictHostKeyChecking for SSH
 initCI () {
   # check git exists
   echo "Checking Git..."
@@ -270,7 +276,19 @@ initCI () {
   [[ -f /.dockerenv ]] && mkdir -p ~/.ssh && touch ~/.ssh/config && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 }
 
-tagRelease () {
+# the createTriggerTag function will:
+#  1. clone a repository
+#  2. checkout its release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
+#  3. checkout a new temporary branch from release trigger branch
+#  4. save SHA of latest commit of the source branch (called DEFAULT_SOURCE_BRANCH=master by default) in the release.properties file
+#  5. optionally, if versions have not been set manually (manual edition is detected automatically),
+#     retrieve the next release and snapshot versions with the provided "increment policy" considering the current versions in the checked out branch
+#  6. create a commit on the temporary branch (it will not trigger any Gitlab CI build)
+#  7. create a tag from this commit (it will trigger a Gitlab CI build to actually launch the release job)
+#  8. push the commit and tag
+#
+# arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
+createTriggerTag () {
   GIT_REPOSITORY_URL="ssh://$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')"
 
   defaultValues
@@ -298,8 +316,8 @@ tagRelease () {
 
   cd $TEMP_CLONE_DIRECTORY
 
-  # checkout the release branch
-  echo " Checking out the release branch: $RELEASE_TRIGGER_BRANCH"
+  # 2. checkout the release trigger branch
+  echo "2. Checking out the release branch: $RELEASE_TRIGGER_BRANCH"
   git checkout -q $RELEASE_TRIGGER_BRANCH
   if [ $? -gt 0 ]; then
     echo
@@ -308,17 +326,24 @@ tagRelease () {
     return 1
   fi
 
+  TMP_RELEASE_TRIGGER_BRANCH=$RELEASE_TRIGGER_BRANCH-tmp
+  # 3. create a new temporary branch
+  echo "3. Creating temporary branch: $TMP_RELEASE_TRIGGER_BRANCH"
+
   # create a new temporary branch from the release trigger branch
-  git checkout -qb $RELEASE_TRIGGER_BRANCH-tmp
+  git checkout -qb $TMP_RELEASE_TRIGGER_BRANCH
   if [ $? -gt 0 ]; then
     echo
-    echo " Unable to checkout to $RELEASE_TRIGGER_BRANCH-tmp branch"
+    echo " Unable to checkout to $TMP_RELEASE_TRIGGER_BRANCH branch"
     cleanUp
     return 1
   fi
 
-  # 2. update the release commit SHA
-  echo "2. Updating release commit SHA"
+  echo
+  echo "== Release updates =="
+
+  # 4. update the release commit SHA
+  echo "4. Updating release commit SHA"
   # replace the release commit SHA in release.properties file 
   sed -i "s|RELEASE_COMMIT_SHA=.*|RELEASE_COMMIT_SHA=$RELEASE_COMMIT_SHA|" release.properties
 
@@ -332,8 +357,18 @@ tagRelease () {
     return 1
   fi
 
-  # 3. create a commit with modified release.properties file (with "[ci skip]" switch)
-  echo "3. Commiting the new release commit SHA"
+  if [ "$RELEASE_VERSION" == "0.0.0" ]; then
+    echo "5. Updating versions"
+    versionsUpdate
+  else
+    echo "5. Not updating versions"
+  fi
+
+  echo
+  echo "== Finalization =="
+
+  # 6. create a commit with modified release.properties file
+  echo "6. Commiting the new release commit SHA"
   git add release.properties && git commit -qm "Tag trigger for release version $RELEASE_VERSION" > /dev/null 2>&1
   COMMIT_RESULT=$?
 
@@ -347,8 +382,8 @@ tagRelease () {
 
   echo
   echo "== Tag trigger creation =="
-  # 4. create the tag rigger
-  echo "4. Creating the tag trigger: $TAG_TRIGGER"
+  # 7. create the tag trigger
+  echo "7. Creating the tag trigger: $TAG_TRIGGER"
   git tag -a $TAG_TRIGGER -m "Creating tag trigger '$TAG_TRIGGER' from '$RELEASE_COMMIT_SHA' commit"
   if [ $COMMIT_RESULT -gt 0 ]; then
     echo " A problem occurred while tagging, not pushing"
@@ -356,18 +391,18 @@ tagRelease () {
   fi
 
   echo
-  # 5. push the commit and the tag
-  echo "5. Pushing the trigger tag: $TAG_TRIGGER"
+  # 8. push the commit and the tag
+  echo "8. Pushing the trigger tag: $TAG_TRIGGER"
 
-  git push origin $RELEASE_TRIGGER_BRANCH-tmp --follow-tags -q > /dev/null 2>&1
+  git push origin $TMP_RELEASE_TRIGGER_BRANCH --follow-tags -q > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo " Successfully pushed the new release commit SHA '$RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
   fi
 
   # delete temporary branch
-  git push -q --delete origin $RELEASE_TRIGGER_BRANCH-tmp # TODO: what if remote name is not origin ?
+  git push -q --delete origin $TMP_RELEASE_TRIGGER_BRANCH # TODO: what if remote name is not origin ?
   if [ $? -gt 0 ]; then
-    echo " Unable to delete $RELEASE_TRIGGER_BRANCH-tmp branch"
+    echo " Unable to delete $TMP_RELEASE_TRIGGER_BRANCH branch"
     cleanUp
     return 1
   fi
@@ -391,10 +426,8 @@ prepareRelease () {
   git config user.email $GIT_USER_EMAIL
   git config push.default upstream
 
-  # delete the branch and check it out again from remote
-  git branch -d $SOURCE_BRANCH
-  git checkout -b $SOURCE_BRANCH remotes/origin/$SOURCE_BRANCH
-  git branch --set-upstream-to=origin/$SOURCE_BRANCH $SOURCE_BRANCH
+  # checkout the commit to release
+  git checkout $RELEASE_COMMIT_SHA
 
   return 0
 }
@@ -468,26 +501,8 @@ triggerRelease () {
     return 1
   fi
 
-  echo
-  echo "== Versions update =="
-  # 2. checkout the source branch
-  echo "2. Checking out the source branch: $SOURCE_BRANCH"
-  git checkout -q $SOURCE_BRANCH
-  if [ $? -gt 0 ]; then
-    echo " Unable to checkout to $SOURCE_BRANCH branch"
-    cleanUp
-    return 1
-  fi
-
-  # 3. retrieve the next versions
-  echo "3. Retrieving the next versions"
-  updateReleaseVersions $INCREMENT_POLICY
-  if [ $? -gt 0 ]; then
-    echo " Unable to update versions!";
-    cleanUp
-    return 1
-  fi
-  echo " New versions are: RELEASE_VERSION=$RELEASE_VERSION and DEV_VERSION=$DEV_VERSION"
+  echo "2. Updating versions"
+  versionsUpdate
 
   echo
   echo "== Release triggering =="
@@ -558,6 +573,29 @@ triggerRelease_loadPropertiesFromFile () {
   simpleConsoleLogger " using '$INCREMENT_POLICY' as increment policy" $NO_BANNER
   simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release branch" $NO_BANNER
   simpleConsoleLogger " using '$SOURCE_BRANCH' as source branch" $NO_BANNER
+}
+
+versionsUpdate () {
+  echo
+  echo "== Versions update =="
+  # a. checkout the source branch
+  echo " a. Checking out the source branch: $SOURCE_BRANCH"
+  git checkout -q $SOURCE_BRANCH
+  if [ $? -gt 0 ]; then
+    echo " Unable to checkout to $SOURCE_BRANCH branch"
+    cleanUp
+    return 1
+  fi
+
+  # b. retrieve the next versions
+  echo " b. Retrieving the next versions"
+  updateReleaseVersions $INCREMENT_POLICY
+  if [ $? -gt 0 ]; then
+    echo " Unable to update versions!";
+    cleanUp
+    return 1
+  fi
+  echo " New versions are: RELEASE_VERSION=$RELEASE_VERSION and DEV_VERSION=$DEV_VERSION"
 }
 
 updateReleaseVersions () {

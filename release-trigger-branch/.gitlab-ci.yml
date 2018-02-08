@@ -12,10 +12,8 @@ tag-release:
   tags:
     - docker
   script:
-    # source maven-auto-releaser script
-    # - source ./release.sh
-    # call tagRelease from maven-auto-releaser script
-    - tagRelease
+    # call createTriggerTag from maven-auto-releaser script
+    - createTriggerTag
   only:
     - $RELEASE_TRIGGER_BRANCH
 
@@ -24,8 +22,6 @@ release:
   tags:
     - docker
   script:
-    # source maven-auto-releaser script
-    # - source ./release.sh
     # call prepareRelease from maven-auto-releaser script
     - prepareRelease
     # call executeRelease from maven-auto-releaser script
