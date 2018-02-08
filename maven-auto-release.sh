@@ -252,13 +252,20 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
 initCI () {
   # check git exists
+  echo "Checking Git..."
   which git || ( echo "git executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
+  echo "Checked  Git"
   # check ssh-agent exists
+  echo "Checking SSH Agent"
   which ssh-agent || ( echo "ssh-agent executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
+  echo "Checked  SSH Agent"
   # run ssh-agent
+  echo "Launching an SSH agent"
   eval $(ssh-agent -s)
   # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+  echo "Adding SSH private key..."
   ssh-add <(echo "$SSH_PRIVATE_KEY")
+  echo "Added  SSH private key"
   # disable host key checking (on Docker runners only)
   [[ -f /.dockerenv ]] && mkdir -p ~/.ssh && touch ~/.ssh/config && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
 }
@@ -268,7 +275,11 @@ tagRelease () {
 
   [ -f ./release.properties ] && source ./release.properties
 
-  echo "Tagging release"
+  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse)"
+
+  echo
+  echo "Creating a trigger tag in $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH, trigger tag will be $TAG_TRIGGER"
+  echo
 }
 
 prepareRelease () {
