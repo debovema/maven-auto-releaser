@@ -281,10 +281,10 @@ initCI () {
 #  2. checkout its release trigger branch (called DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger by default)
 #  3. checkout a new temporary branch from release trigger branch
 #  4. save SHA of latest commit of the source branch (called DEFAULT_SOURCE_BRANCH=master by default) in the release.properties file
-#  5. optionally, if versions have not been set manually (manual edition is detected automatically),
+#  5. create a commit on the temporary branch (it will not trigger any Gitlab CI build)
+#  6. optionally, if versions have not been set manually (manual edition is detected automatically),
 #     retrieve the next release and snapshot versions with the provided "increment policy" considering the current versions in the checked out branch
-#  6. create a commit on the temporary branch (it will not trigger any Gitlab CI build)
-#  7. create a tag from this commit (it will trigger a Gitlab CI build to actually launch the release job)
+#  7. create a tag from the latest commit of temporary branch (it will trigger a Gitlab CI build to actually launch the release job)
 #  8. push the commit and tag
 #
 # arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
@@ -357,19 +357,9 @@ createTriggerTag () {
     return 1
   fi
 
-  if [ "$RELEASE_VERSION" == "0.0.0" ]; then
-    echo "5. Updating versions"
-    versionsUpdate
-  else
-    echo "5. Not updating versions"
-  fi
-
-  echo
-  echo "== Finalization =="
-
-  # 6. create a commit with modified release.properties file
-  echo "6. Commiting the new release commit SHA"
-  git add release.properties && git commit -qm "Tag trigger for release version $RELEASE_VERSION" > /dev/null 2>&1
+  # 5. create a commit with modified release.properties file
+  echo "5. Commiting the new release commit SHA"
+  git add release.properties && git commit -qm "Set SHA '$RELEASE_COMMIT_SHA' for release version $RELEASE_VERSION" > /dev/null 2>&1
   COMMIT_RESULT=$?
 
   if [ $COMMIT_RESULT -gt 0 ]; then
@@ -379,6 +369,41 @@ createTriggerTag () {
     fi
 	return 1
   fi
+
+  if [ "$RELEASE_VERSION" == "0.0.0" ]; then
+    echo "6. Updating versions"
+    versionsUpdate
+
+    # switch back to the temporary branch
+    git checkout -q $TMP_RELEASE_TRIGGER_BRANCH
+    if [ $? -gt 0 ]; then
+      echo
+      echo " Unable to checkout to $TMP_RELEASE_TRIGGER_BRANCH branch"
+      cleanUp
+      return 1
+    fi
+
+    echo " c. Updating the versions in release.properties"
+    sed -i "s/\(RELEASE_VERSION=\).*\$/\1${RELEASE_VERSION}/" release.properties
+    sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" release.properties
+
+    echo " d. Commiting the new release versions"
+    git add release.properties && git commit -qm "Set release version $RELEASE_VERSION and development version $DEV_VERSION" > /dev/null 2>&1
+    COMMIT_RESULT=$?
+
+    if [ $COMMIT_RESULT -gt 0 ]; then
+      echo " A problem occurred while committing, not pushing anything"
+      if [ $COMMIT_RESULT -eq 128 ]; then
+        echo " You must set a Git user name and email"
+      fi
+	  return 1
+    fi
+  else
+    echo "6. Not updating versions"
+  fi
+
+  echo
+  echo "== Finalization =="
 
   echo
   echo "== Tag trigger creation =="
