@@ -352,14 +352,14 @@ tagRelease () {
   git tag -a $TAG_TRIGGER -m "Creating tag trigger '$TAG_TRIGGER' from '$RELEASE_COMMIT_SHA' commit"
   if [ $COMMIT_RESULT -gt 0 ]; then
     echo " A problem occurred while tagging, not pushing"
-	return 1
+    return 1
   fi
 
   echo
   # 5. push the commit and the tag
   echo "5. Pushing the trigger tag: $TAG_TRIGGER"
 
-  git push origin $RELEASE_TRIGGER_BRANCH --follow-tags -q > /dev/null 2>&1
+  git push origin $RELEASE_TRIGGER_BRANCH-tmp --follow-tags -q > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     echo " Successfully pushed the new release commit SHA 'RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
   fi
