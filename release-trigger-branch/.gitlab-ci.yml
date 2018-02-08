@@ -15,6 +15,18 @@ before_script:
 stages:
   - release
 
+tag-release:
+  stage: release
+  tags:
+    - docker
+  script:
+    # source maven-auto-releaser script
+    - source ./release.sh
+    # call tagRelease from maven-auto-releaser script
+    - tagRelease
+  only:
+    - $RELEASE_TRIGGER_BRANCH
+
 release:
   stage: release
   tags:
@@ -27,4 +39,4 @@ release:
     # call executeRelease from maven-auto-releaser script
     - executeRelease
   only:
-    - $RELEASE_TRIGGER_BRANCH
+    - tags
