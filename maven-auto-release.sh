@@ -271,15 +271,90 @@ initCI () {
 }
 
 tagRelease () {
+  GIT_REPOSITORY_URL=$(git config --get remote.origin.url) # use remote URL of current repository (assuming remote is called origin)
+
   defaultValues
 
   [ -f ./release.properties ] && source ./release.properties
 
-  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
-
   echo
   echo "Creating a trigger tag in $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH, trigger tag will be $TAG_TRIGGER"
   echo
+
+  echo "== Initialization =="
+  # 1. clone the repository to a temporary directory
+  TEMP_CLONE_DIRECTORY=$(mktemp -d)
+  echo "1. Cloning the repository at $GIT_REPOSITORY_URL to $TEMP_CLONE_DIRECTORY"
+  git clone -q $GIT_REPOSITORY_URL $TEMP_CLONE_DIRECTORY
+  if [ $? -gt 0 ]; then
+    echo " Unable to clone $GIT_REPOSITORY_URL"
+    return 1
+  fi
+
+  cd $TEMP_CLONE_DIRECTORY
+
+  # checkout the release branch
+  echo " Checking out the release branch: $RELEASE_TRIGGER_BRANCH"
+  git checkout -q $RELEASE_TRIGGER_BRANCH
+  if [ $? -gt 0 ]; then
+    echo
+    echo " Unable to checkout to $RELEASE_TRIGGER_BRANCH branch"
+    cleanUp
+    return 1
+  fi
+
+  # 2. update the release commit SHA
+  echo "2. Updating release commit SHA"
+  # get SHA of the latest commit of the source branch
+  RELEASE_COMMIT_SHA=$(git rev-parse $SOURCE_BRANCH)
+  # generate the tag trigger name composed of the release trigger branch, the version to be released, the SHA of the latest commit of the source branch
+  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
+
+  # replace the release commit SHA in release.properties file 
+  sed -i "s|RELEASE_COMMIT_SHA=.*|RELEASE_COMMIT_SHA=$RELEASE_COMMIT_SHA|" release.properties
+
+  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
+  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
+
+  # check whether the repository is clean (nothing to add)
+  if [ -z "$(git status -s)" ]; then
+    echo " No change since last release. Aborting."
+    cleanUp
+    return 1
+  fi
+
+  # 3. create a commit with modified release.properties file (with "[ci skip]" switch)
+  echo "3. Commiting the new release commit SHA"
+  git add release.properties && git commit -qm "[ci skip] Tag trigger for release version $RELEASE_VERSION" > /dev/null 2>&1
+  COMMIT_RESULT=$?
+
+  if [ $COMMIT_RESULT -gt 0 ]; then
+    echo " A problem occurred while committing, not pushing anything"
+    if [ $COMMIT_RESULT -eq 128 ]; then
+      echo " You must set a Git user name and email"
+    fi
+	return 1
+  else
+    git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo " Successfully pushed the new release commit SHA"
+    fi
+  fi
+
+  echo
+  echo "== Tag trigger creation =="
+  # 4. create the tag rigger
+  echo "4. Creating the tag trigger: $TAG_TRIGGER"
+  git tag -a $TAG_TRIGGER -m "Creating tag trigger $TAG_TRIGGER"
+  if [ $COMMIT_RESULT -gt 0 ]; then
+    echo " A problem occurred while tagging, not pushing"
+	return 1
+  fi
+  git push origin $TAG_TRIGGER -q > /dev/null 2>&1
+
+  # clean up and restore initial directory
+  cleanUp
+  return 0
 }
 
 prepareRelease () {
