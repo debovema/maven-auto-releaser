@@ -250,6 +250,27 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
 ### release triggering ###
 
+initCI () {
+  # check git exists
+  which git || ( echo "git executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
+  # check ssh-agent exists
+  which ssh-agent || ( echo "ssh-agent executable is not found in docker-registry.square-it.grp:5000/soft/maven:3.5.2-4\nUse a Docker image with prerequisites installed" )
+  # run ssh-agent
+  eval $(ssh-agent -s)
+  # add ssh key stored in SSH_PRIVATE_KEY variable to the agent store
+  ssh-add <(echo "$SSH_PRIVATE_KEY")
+  # disable host key checking (on Docker runners only)
+  [[ -f /.dockerenv ]] && mkdir -p ~/.ssh && touch ~/.ssh/config && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+}
+
+tagRelease () {
+  defaultValues
+
+  [ -f ./release.properties ] && source ./release.properties
+
+  echo "Tagging release"
+}
+
 prepareRelease () {
   defaultValues
 
