@@ -271,7 +271,7 @@ initCI () {
 }
 
 tagRelease () {
-  GIT_REPOSITORY_URL=$(git config --get remote.origin.url) # use remote URL of current repository (assuming remote is called origin)
+  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')
 
   defaultValues
 
