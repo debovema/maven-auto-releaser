@@ -275,7 +275,7 @@ tagRelease () {
 
   [ -f ./release.properties ] && source ./release.properties
 
-  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse)"
+  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
 
   echo
   echo "Creating a trigger tag in $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH, trigger tag will be $TAG_TRIGGER"
