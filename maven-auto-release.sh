@@ -166,7 +166,7 @@ getProjectName () {
   PROJECT_NAME=${PROJECT_BASE_NAME%.*}
 
   # if POM exists and has a <name> element
-  MAVEN_PROJECT_EVAL=$(mvn -N -Dexpression=project.name help:evaluate)
+  MAVEN_PROJECT_EVAL=$(mvn -B -N -Dexpression=project.name help:evaluate)
   [ $? -eq 0 ] && MAVEN_PROJECT_NAME=$(echo "$MAVEN_PROJECT_EVAL" | grep -Ev '(^\[|Download\w+:)')
   [ $? -eq 0 ] && [ "$MAVEN_PROJECT_NAME" != "Maven Stub Project (No POM)" ] && PROJECT_NAME=$MAVEN_PROJECT_NAME
 
