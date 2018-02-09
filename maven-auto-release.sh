@@ -301,7 +301,7 @@ createTriggerTag () {
   TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
  
   echo
-  echo "Creating a trigger tag in $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH, trigger tag will be $TAG_TRIGGER"
+  echo "Creating a trigger tag in $GIT_REPOSITORY_URL, source branch is $SOURCE_BRANCH, release trigger branch is $RELEASE_TRIGGER_BRANCH"
   echo
 
   echo "== Initialization =="
@@ -378,6 +378,11 @@ createTriggerTag () {
     echo "4. Not updating versions"
   fi
 
+  # get SHA of the latest commit of the source branch
+  RELEASE_COMMIT_SHA=$(git rev-parse $SOURCE_BRANCH)
+  # generate the tag trigger name composed of the release trigger branch, the version to be released, the SHA of the latest commit of the source branch
+  TAG_TRIGGER="$RELEASE_TRIGGER_BRANCH-$RELEASE_VERSION-$(git rev-parse $SOURCE_BRANCH)"
+ 
   # 5. update the release commit SHA
   echo "5. Updating release commit SHA"
   # replace the release commit SHA in release.properties file 
@@ -406,9 +411,6 @@ createTriggerTag () {
 
   echo
   echo "== Finalization =="
-
-  echo
-  echo "== Tag trigger creation =="
   # 7. create the tag trigger
   echo "7. Creating the tag trigger: $TAG_TRIGGER"
   git tag -a $TAG_TRIGGER -m "Creating tag trigger '$TAG_TRIGGER' from '$RELEASE_COMMIT_SHA' commit"
