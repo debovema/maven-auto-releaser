@@ -361,7 +361,7 @@ createTriggerTag () {
     sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" release.properties
 
     echo " d. Commiting the new release versions"
-    git add release.properties && git commit -qm "Set release version $RELEASE_VERSION and development version $DEV_VERSION" > /dev/null 2>&1
+    git add release.properties && git commit -qm "Set release version $RELEASE_VERSION and development version $DEV_VERSION" # > /dev/null 2>&1
     COMMIT_RESULT=$?
 
     if [ $COMMIT_RESULT -gt 0 ]; then
@@ -369,7 +369,7 @@ createTriggerTag () {
       if [ $COMMIT_RESULT -eq 128 ]; then
         echo " You must set a Git user name and email"
       fi
-	  return 1
+      return 1
     fi
   else
     echo "4. Not updating versions"
