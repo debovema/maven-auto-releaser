@@ -342,24 +342,9 @@ createTriggerTag () {
   echo
   echo "== Release updates =="
 
-  # 4. update the release commit SHA
-  echo "4. Updating release commit SHA"
-  # replace the release commit SHA in release.properties file 
-  sed -i "s|RELEASE_COMMIT_SHA=.*|RELEASE_COMMIT_SHA=$RELEASE_COMMIT_SHA|" release.properties
-
-  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
-  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
-
-  # check whether the repository is clean (nothing to add)
-  if [ -z "$(git status -s)" ]; then
-    echo " No change since last release. Aborting."
-    cleanUp
-    return 1
-  fi
-
-  # 5.
+  # 4.
   if [ "$RELEASE_VERSION" == "0.0.0" ]; then
-    echo "5. Updating versions"
+    echo "4. Updating versions"
     versionsUpdate
 
     # switch back to the temporary branch
@@ -387,8 +372,24 @@ createTriggerTag () {
 	  return 1
     fi
   else
-    echo "5. Not updating versions"
+    echo "4. Not updating versions"
   fi
+
+  # 5. update the release commit SHA
+  echo "5. Updating release commit SHA"
+  # replace the release commit SHA in release.properties file 
+  sed -i "s|RELEASE_COMMIT_SHA=.*|RELEASE_COMMIT_SHA=$RELEASE_COMMIT_SHA|" release.properties
+
+  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
+  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
+
+  # check whether the repository is clean (nothing to add)
+  if [ -z "$(git status -s)" ]; then
+    echo " No change since last release. Aborting."
+    cleanUp
+    return 1
+  fi
+
 
   # 6. create a commit with modified release.properties file
   echo "6. Commiting the new release commit SHA"
