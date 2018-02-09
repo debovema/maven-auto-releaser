@@ -666,6 +666,7 @@ replaceProperties () {
   replaceProperty $1 PROJECT_NAME
   replaceProperty $1 SOURCE_BRANCH
   replaceProperty $1 RELEASE_TRIGGER_BRANCH
+  replaceProperty $1 INCREMENT_POLICY
   replaceProperty $1 GIT_USER_NAME
   replaceProperty $1 GIT_USER_EMAIL
   replaceProperty $1 DOCKER_IMAGE
