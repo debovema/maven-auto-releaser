@@ -357,21 +357,9 @@ createTriggerTag () {
     return 1
   fi
 
-  # 5. create a commit with modified release.properties file
-  echo "5. Commiting the new release commit SHA"
-  git add release.properties && git commit -qm "Set SHA '$RELEASE_COMMIT_SHA' for release version $RELEASE_VERSION" > /dev/null 2>&1
-  COMMIT_RESULT=$?
-
-  if [ $COMMIT_RESULT -gt 0 ]; then
-    echo " A problem occurred while committing, not pushing anything"
-    if [ $COMMIT_RESULT -eq 128 ]; then
-      echo " You must set a Git user name and email"
-    fi
-	return 1
-  fi
-
+  # 5.
   if [ "$RELEASE_VERSION" == "0.0.0" ]; then
-    echo "6. Updating versions"
+    echo "5. Updating versions"
     versionsUpdate
 
     # switch back to the temporary branch
@@ -399,7 +387,20 @@ createTriggerTag () {
 	  return 1
     fi
   else
-    echo "6. Not updating versions"
+    echo "5. Not updating versions"
+  fi
+
+  # 6. create a commit with modified release.properties file
+  echo "6. Commiting the new release commit SHA"
+  git add release.properties && git commit -qm "Set SHA '$RELEASE_COMMIT_SHA' for release version $RELEASE_VERSION" > /dev/null 2>&1
+  COMMIT_RESULT=$?
+
+  if [ $COMMIT_RESULT -gt 0 ]; then
+    echo " A problem occurred while committing, not pushing anything"
+    if [ $COMMIT_RESULT -eq 128 ]; then
+      echo " You must set a Git user name and email"
+    fi
+	return 1
   fi
 
   echo
