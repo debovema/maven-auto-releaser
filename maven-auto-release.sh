@@ -455,8 +455,10 @@ prepareRelease () {
   git config user.email $GIT_USER_EMAIL
   git config push.default upstream
 
-  # checkout the commit to release
-  git checkout $RELEASE_COMMIT_SHA
+  # delete the branch and check it out again from release commit SHA
+  git branch -d $SOURCE_BRANCH
+  git checkout -b $SOURCE_BRANCH $RELEASE_COMMIT_SHA
+  git branch --set-upstream-to=origin/$SOURCE_BRANCH $SOURCE_BRANCH
 
   return 0
 }
