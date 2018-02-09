@@ -339,6 +339,9 @@ createTriggerTag () {
     return 1
   fi
 
+  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
+  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
+ 
   echo
   echo "== Release updates =="
 
@@ -379,9 +382,6 @@ createTriggerTag () {
   echo "5. Updating release commit SHA"
   # replace the release commit SHA in release.properties file 
   sed -i "s|RELEASE_COMMIT_SHA=.*|RELEASE_COMMIT_SHA=$RELEASE_COMMIT_SHA|" release.properties
-
-  [ -z "$GIT_USER_NAME" ] || git config user.name $GIT_USER_NAME
-  [ -z "$GIT_USER_EMAIL" ] || git config user.email $GIT_USER_EMAIL
 
   # check whether the repository is clean (nothing to add)
   if [ -z "$(git status -s)" ]; then
