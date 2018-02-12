@@ -533,7 +533,7 @@ executeRelease () {
   case "$MAVEN_RELEASER" in
     "unleash")
       echo " Executing release build using unleash-maven-plugin releaser."
-      mvn unleash:perform -X -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION
+      mvn unleash:perform -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION
     ;;
     "maven")
       echo " Executing release build using unleash-maven-plugin releaser."
