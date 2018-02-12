@@ -150,6 +150,9 @@ createReleaseTriggerBranch_loadPropertiesFromFile () {
 
   [ -f ./branch.properties ] && source ./branch.properties
 
+  [ ! -z "$RELEASE_TRIGGER_BRANCH_SEMVER" ] && RELEASE_TRIGGER_BRANCH=$RELEASE_TRIGGER_BRANCH_SEMVER
+  [ ! -z "$INCREMENT_POLICY_SEMVER" ] && INCREMENT_POLICY=$INCREMENT_POLICY_SEMVER
+
   displayBanner
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
@@ -227,7 +230,7 @@ deleteReleaseTriggerBranch_usage () {
 }
 
 deleteReleaseTriggerBranch_loadPropertiesFromFile () {
-  unset GIT_REPOSITORY_URL RELEASE_TRIGGER_BRANCH
+  unset GIT_REPOSITORY_URL
 
   if [ "$#" -lt 1 ]; then
     echo
@@ -241,12 +244,70 @@ deleteReleaseTriggerBranch_loadPropertiesFromFile () {
 
   [ -f ./branch.properties ] && source ./branch.properties
 
+  [ ! -z "$RELEASE_TRIGGER_BRANCH_SEMVER" ] && RELEASE_TRIGGER_BRANCH=$RELEASE_TRIGGER_BRANCH_SEMVER
+
   displayBanner
   simpleConsoleLogger "" $NO_BANNER
   simpleConsoleLogger "Arguments:" $NO_BANNER
   simpleConsoleLogger " using '$RELEASE_TRIGGER_BRANCH' as release trigger branch" $NO_BANNER
 }
 
+createSemVerReleaseTriggerBranches () {
+  unset GIT_REPOSITORY_URL
+
+  if [ "$#" -lt 1 ]; then
+    echo
+    echo " At least a Git repository URL is required" >&2
+    return 1
+  fi
+
+  GIT_REPOSITORY_URL=$1
+
+  defaultValues
+
+  [ -f ./branch.properties ] && source ./branch.properties
+
+  ORIGINAL_RELEASE_TRIGGER_BRANCH=$RELEASE_TRIGGER_BRANCH
+
+  RELEASE_TRIGGER_BRANCH_SEMVER=$ORIGINAL_RELEASE_TRIGGER_BRANCH-revision
+  INCREMENT_POLICY_SEMVER=revision
+  createReleaseTriggerBranch $@
+
+  RELEASE_TRIGGER_BRANCH_SEMVER=$ORIGINAL_RELEASE_TRIGGER_BRANCH-minor
+  INCREMENT_POLICY_SEMVER=minor
+  createReleaseTriggerBranch $@
+
+  RELEASE_TRIGGER_BRANCH_SEMVER=$ORIGINAL_RELEASE_TRIGGER_BRANCH-major
+  INCREMENT_POLICY_SEMVER=major
+  createReleaseTriggerBranch $@
+}
+
+deleteSemVerReleaseTriggerBranches () {
+  unset GIT_REPOSITORY_URL
+
+  if [ "$#" -lt 1 ]; then
+    echo
+    echo " At least a Git repository URL is required" >&2
+    return 1
+  fi
+
+  GIT_REPOSITORY_URL=$1
+
+  defaultValues
+
+  [ -f ./branch.properties ] && source ./branch.properties
+
+  ORIGINAL_RELEASE_TRIGGER_BRANCH=$RELEASE_TRIGGER_BRANCH
+
+  RELEASE_TRIGGER_BRANCH_SEMVER=$ORIGINAL_RELEASE_TRIGGER_BRANCH-revision
+  deleteReleaseTriggerBranch $@
+
+  RELEASE_TRIGGER_BRANCH_SEMVER=$ORIGINAL_RELEASE_TRIGGER_BRANCH-minor
+  deleteReleaseTriggerBranch $@
+
+  RELEASE_TRIGGER_BRANCH_SEMVER=$ORIGINAL_RELEASE_TRIGGER_BRANCH-major
+  deleteReleaseTriggerBranch $@
+}
 
 ### release triggering runtime ###
 
