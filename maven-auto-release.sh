@@ -493,6 +493,36 @@ createTriggerTag () {
     echo " Successfully pushed the new release commit SHA '$RELEASE_COMMIT_SHA' in tag '$TAG_TRIGGER'"
   fi
 
+  # 9. cleaning the versions
+  echo "9. Cleaning the release.properties file"
+
+  # switch back to the temporary branch
+  git checkout -q $RELEASE_TRIGGER_BRANCH
+  if [ $? -gt 0 ]; then
+    echo
+    echo " Unable to checkout to $RELEASE_TRIGGER_BRANCH branch"
+    cleanUp
+    return 1
+  fi
+
+  # put value 0.0.0 in RELEASE_VERSION property
+  sed -i "s/\(RELEASE_VERSION=\).*\$/\10.0.0/" release.properties
+  git add release.properties && git commit -qm "[ci skip] Cleaning up release.properties" > /dev/null 2>&1
+  COMMIT_RESULT=$?
+
+  if [ $COMMIT_RESULT -gt 0 ]; then
+    echo " A problem occurred while committing, not pushing anything"
+    if [ $COMMIT_RESULT -eq 128 ]; then
+      echo " You must set a Git user name and email"
+    fi
+  else
+    echo " Pushing to the release trigger branch";
+    git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo " Successfully pushed on the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
+    fi
+  fi
+
   # delete temporary branch
   git push -q --delete origin $TMP_RELEASE_TRIGGER_BRANCH # TODO: what if remote name is not origin ?
   if [ $? -gt 0 ]; then
@@ -638,26 +668,6 @@ triggerRelease () {
       echo " Successfully pushed on the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
     fi
   fi
-
-  # 7. cleaning the versions
-  echo "7. Cleaning the release.properties file"
-  sed -i "s/\(RELEASE_VERSION=\).*\$/\10.0.0/" release.properties
-  git add release.properties && git commit -qm "[ci skip] Cleaning up release.properties" > /dev/null 2>&1
-  COMMIT_RESULT=$?
-
-  if [ $COMMIT_RESULT -gt 0 ]; then
-    echo " A problem occurred while committing, not pushing anything"
-    if [ $COMMIT_RESULT -eq 128 ]; then
-      echo " You must set a Git user name and email"
-    fi
-  else
-    echo " Pushing to the release trigger branch";
-    git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      echo " Successfully pushed on the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
-    fi
-  fi
-
 
   # clean up and restore initial directory
   cleanUp
