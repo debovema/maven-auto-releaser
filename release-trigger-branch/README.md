@@ -1,6 +1,6 @@
 # $PROJECT_NAME
 
-This branch (*$RELEASE_TRIGGER_BRANCH*) is the [**release trigger branch**](#release-trigger-branch) for the **$PROJECT_NAME** project.
+This branch (*$RELEASE_TRIGGER_BRANCH*) is a [**release trigger branch**](#release-trigger-branch) for the **$PROJECT_NAME** project.
 
 ## Release trigger branch
 
