@@ -11,6 +11,11 @@ This branch is a release trigger. It means that **whenever a commit is pushed on
 There is two different methods to trigger a release.
 They will both commit & push a change on this *release trigger branch* which will trigger a build on Gitlab CI.
 
+### automatically from Gitlab
+
+To trigger a new release with *$INCREMENT_POLICY* increment policy, simply [run a new pipeline]($GIT_REPOSITORY_URL_NO_EXT/pipelines/new) after selecting *$RELEASE_TRIGGER_BRANCH* in the list.
+That's it !
+
 ### automatically
 
 * clone this repository:

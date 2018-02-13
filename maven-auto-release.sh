@@ -746,9 +746,11 @@ updateReleaseVersions () {
 
 replaceProperties () {
   GIT_REPOSITORY_BASENAME=$(basename $GIT_REPOSITORY_URL | cut -f 1 -d '.')
+  GIT_REPOSITORY_URL_NO_EXT=$(echo $GIT_REPOSITORY_URL | cut -f 1 -d '.')
 
   replaceProperty $1 GIT_REPOSITORY_URL
   replaceProperty $1 GIT_REPOSITORY_BASENAME
+  replaceProperty $1 GIT_REPOSITORY_URL_NO_EXT
   replaceProperty $1 PROJECT_NAME
   replaceProperty $1 SOURCE_BRANCH
   replaceProperty $1 RELEASE_TRIGGER_BRANCH
