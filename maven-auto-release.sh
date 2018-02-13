@@ -4,7 +4,7 @@
 # released by Mathieu Debove (https://github.com/debovema) under Apache License, Version 2.0
 
 MAVEN_AUTO_RELEASER_VERSION=1.0.0-beta5 # this is the displayed version (in banner)
-MAVEN_AUTO_RELEASER_VERSION_TAG=v$MAVEN_AUTO_RELEASER_VERSION #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
+MAVEN_AUTO_RELEASER_VERSION_TAG=master # v$MAVEN_AUTO_RELEASER_VERSION #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 DEFAULT_SOURCE_BRANCH=master
@@ -407,7 +407,10 @@ createTriggerTag () {
   echo "== Release updates =="
 
   # 4.
-  if [ "$RELEASE_VERSION" == "0.0.0" ]; then
+  # check whether release.properties was changed in last commit (greater than zero if true)
+  VERSIONS_SET_MANUALLY=$([ "`git rev-parse @:release.properties`" == "`git rev-parse @~:release.properties`" ])
+
+  if [ "$RELEASE_VERSION" == "0.0.0" ] || [ $VERSIONS_SET_MANUALLY -eq 0 ]; then
     echo "4. Updating versions"
     versionsUpdate
 
