@@ -495,19 +495,22 @@ createTriggerTag () {
 
   # put value 0.0.0 in RELEASE_VERSION property
   sed -i "s/\(RELEASE_VERSION=\).*\$/\10.0.0/" release.properties
-  git add release.properties && git commit -qm "[ci skip] Cleaning up release.properties" > /dev/null 2>&1
-  COMMIT_RESULT=$?
 
-  if [ $COMMIT_RESULT -gt 0 ]; then
-    echo " A problem occurred while committing, not pushing anything"
-    if [ $COMMIT_RESULT -eq 128 ]; then
-      echo " You must set a Git user name and email"
-    fi
-  else
-    echo " Pushing to the release trigger branch";
-    git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
-    if [ $? -eq 0 ]; then
-      echo " Successfully pushed on the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
+  if [ ! -z "$(git status -s)" ]; then # only if there is a change
+    git add release.properties && git commit -qm "[ci skip] Cleaning up release.properties" # > /dev/null 2>&1
+    COMMIT_RESULT=$?
+
+    if [ $COMMIT_RESULT -gt 0 ]; then
+      echo " A problem occurred while committing, not pushing anything"
+      if [ $COMMIT_RESULT -eq 128 ]; then
+        echo " You must set a Git user name and email"
+      fi
+    else
+      echo " Pushing to the release trigger branch";
+      git push origin $RELEASE_TRIGGER_BRANCH -q > /dev/null 2>&1
+      if [ $? -eq 0 ]; then
+        echo " Successfully pushed on the release trigger branch '$RELEASE_TRIGGER_BRANCH'"
+      fi
     fi
   fi
 
