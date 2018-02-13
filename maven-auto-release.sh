@@ -411,7 +411,7 @@ createTriggerTag () {
   SHA1=$(git rev-parse @:release.properties)
   SHA2=$(git rev-parse @~:release.properties)
 
-  [ "$SHA1" == "$SHA2" ]
+  [[ "$SHA1" == "$SHA2" ]]
   VERSIONS_SET_MANUALLY=$?
   echo "v is $VERSIONS_SET_MANUALLY"
 
