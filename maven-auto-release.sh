@@ -410,9 +410,11 @@ createTriggerTag () {
   # check whether release.properties was changed in last commit (greater than zero if true)
   SHA1=$(git rev-parse @:release.properties)
   SHA2=$(git rev-parse @~:release.properties)
+  echo $SHA1
+  echo $SHA2
 
-  [[ "$SHA1" == "$SHA2" ]]
-  VERSIONS_SET_MANUALLY=$?
+  VERSIONS_SET_MANUALLY=0
+  [[ "$SHA1" != "$SHA2" ]] && VERSIONS_SET_MANUALLY=1
   echo "v is $VERSIONS_SET_MANUALLY"
 
   if [ "$RELEASE_VERSION" == "0.0.0" ] || [ $VERSIONS_SET_MANUALLY -eq 0 ]; then
