@@ -497,7 +497,7 @@ createTriggerTag () {
   sed -i "s/\(RELEASE_VERSION=\).*\$/\10.0.0/" release.properties
 
   if [ ! -z "$(git status -s)" ]; then # only if there is a change
-    git add release.properties && git commit -qm "[ci skip] Cleaning up release.properties" # > /dev/null 2>&1
+    git add release.properties && git commit -qm "[ci skip] Cleaning up release.properties" > /dev/null 2>&1
     COMMIT_RESULT=$?
 
     if [ $COMMIT_RESULT -gt 0 ]; then
