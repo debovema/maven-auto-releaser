@@ -427,18 +427,6 @@ createTriggerTag () {
     echo " c. Updating the versions in release.properties"
     sed -i "s/\(RELEASE_VERSION=\).*\$/\1${RELEASE_VERSION}/" release.properties
     sed -i "s/\(DEV_VERSION=\).*\$/\1${DEV_VERSION}/" release.properties
-
-    echo " d. Commiting the new release versions"
-    git add release.properties && git commit -qm "Set release version $RELEASE_VERSION and development version $DEV_VERSION" # > /dev/null 2>&1
-    COMMIT_RESULT=$?
-
-    if [ $COMMIT_RESULT -gt 0 ]; then
-      echo " A problem occurred while committing, not pushing anything"
-      if [ $COMMIT_RESULT -eq 128 ]; then
-        echo " You must set a Git user name and email"
-      fi
-      return 1
-    fi
   else
     echo "4. Not updating versions"
   fi
@@ -497,7 +485,7 @@ createTriggerTag () {
   echo "9. Cleaning the release.properties file"
 
   # switch back to the temporary branch
-  git checkout -q $RELEASE_TRIGGER_BRANCH
+  git checkout $RELEASE_TRIGGER_BRANCH
   if [ $? -gt 0 ]; then
     echo
     echo " Unable to checkout to $RELEASE_TRIGGER_BRANCH branch"
