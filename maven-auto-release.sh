@@ -533,8 +533,7 @@ prepareRelease () {
   # source release.properties
   [ -f ./release.properties ] && source ./release.properties
 
-  cat ./release.properties
-  echo "$UNLEASH_WORKFLOW_URL"
+  cp ./release.properties /tmp/release.properties
 
   SSH_GIT_URL=$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')
   git remote set-url origin ssh://$SSH_GIT_URL
@@ -556,9 +555,7 @@ executeRelease () {
   defaultValues
 
   # source release.properties
-  [ -f ./release.properties ] && source ./release.properties
-
-  cat ./release.properties
+  [ -f /tmp/release.properties ] && source /tmp/release.properties
 
   case "$MAVEN_RELEASER" in
     "unleash")
