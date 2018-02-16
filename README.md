@@ -16,7 +16,7 @@ This tool is composed of **two parts**:
 The main idea behind the *release trigger branch* concept is to create a Git branch on all repositories of the projects to release called the *release trigger branch*.
 
 This branch will be composed of:
-* a Continuous Integration configuration file (for Gitlab CI, it's the *.gitlab-cy.yml*). In this file, a trigger is set to be executed **whenever a commit is pushed on the _release trigger branch_**.
+* a Continuous Integration configuration file (for Gitlab CI, it's the *.gitlab-ci.yml*). In this file, a trigger is set to be executed **whenever a commit is pushed on the _release trigger branch_**.
 * a *release.properties* file with information for the next version to be released.
 * an execution script, *release.sh*, called by the Continuous Integration trigger. It will execute the actual release Maven build.
 * a *README.md* file with built-in help to guide end-users in the release process of their Maven projects
@@ -37,19 +37,6 @@ There are two properties file used by the **Maven auto releaser**: *branch.prope
 * *branch.properties* is used to provide parameters for the *release trigger branch* creation step. It is expected to be created in the same directory as the *maven-auto-release.sh* script.
 * *release.properties* is used to provide parameters for the trigger and execution of releases. It is stored directly on the *release trigger branch*. To edit this file without triggering release, **add the [ci skip] prefix in the commit message** before pushing.
 
-#### List of supported properties in *branch.properties*
-
-| Property                 | Description                                                                                             | Default value       |
-|--------------------------|---------------------------------------------------------------------------------------------------------|---------------------|
-| DOCKER\_IMAGE            | The Docker image for Gitlab CI builds to be set in *release.properties*                                 | debovema/docker-mvn |
-| GIT\_USER\_EMAIL         | Value of git config user.email to be set in *release.properties*                                        | auto@release.io     |
-| GIT\_USER\_NAME          | Value of git config user.name to be set in *release.properties*                                         | "Auto releaser"     |
-| INCREMENT\_POLICY        | The increment policy to be set in *release.properties*. <br />Values can be: revision, minor, major     | revision            |
-| MAVEN\_RELEASER          | The Maven plugin used to release to be set in *release.properties*. <br />Values can be: maven, unleash | unleash             |
-| MODE_SCRIPT_CONTENT      | The mode for script content. <br />Values can be: remote, local                                         | remote              |
-| RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases to be set in *release.properties*                   | release-trigger     |
-| SOURCE\_BRANCH           | The branch to checkout to initiate releases to be set in *release.properties*                           | master              |
-
 #### List of supported properties in *release.properties*
 
 | Property                 | Description                                                 | Example            |
@@ -62,6 +49,19 @@ There are two properties file used by the **Maven auto releaser**: *branch.prope
 | INCREMENT\_POLICY        | The increment policy. Values can be: revision, minor, major | revision           |
 | RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases         | release-trigger    |
 | SOURCE\_BRANCH           | The branch to checkout to initiate releases                 | master             |
+
+#### List of supported properties in *branch.properties*
+
+All properties of *release.properties* file can be set in *branch.properties* (except DEV\_VERSION and RELEASE\_VERSION).
+They will be forwarded to the *release.properties* during *release trigger branch* creation.
+In addition, these properties are also available specifically:
+
+| Property                 | Description                                                                                             | Default value       |
+|--------------------------|---------------------------------------------------------------------------------------------------------|---------------------|
+| DOCKER\_IMAGE            | The Docker image for Gitlab CI builds to be set in *release.properties*                                 | debovema/docker-mvn |
+| MAVEN\_RELEASER          | The Maven plugin used to release to be set in *release.properties*. <br />Values can be: maven, unleash | unleash             |
+| UNLEASH\_WORKFLOW\_URL   | (optional, if MAVEN\_RELEASER == unleash) an URL to fetch the Maven unleash plugin workflow at runtime  |                     |
+| MODE\_SCRIPT\_CONTENT    | The mode for script content. <br />Values can be: remote, local                                         | remote              |
 
 ### Supported **Continuous Integration** backends
 

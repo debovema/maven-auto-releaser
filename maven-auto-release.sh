@@ -558,7 +558,13 @@ executeRelease () {
   case "$MAVEN_RELEASER" in
     "unleash")
       echo " Executing release build using unleash-maven-plugin releaser."
-      mvn unleash:perform -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION
+      if [ -z "$UNLEASH_WORKFLOW_URL" ]; then
+        curl -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
+        WORKFLOW_PARAM=/tmp/unleash-workflow
+      else
+        WORKFLOW_PARAM=
+      fi
+      mvn unleash:perform -Dunleash.developmentVersion=$DEV_VERSION -Dunleash.releaseVersion=$RELEASE_VERSION $WORKFLOW_PARAM
     ;;
     "maven")
       echo " Executing release build using unleash-maven-plugin releaser."
@@ -760,6 +766,7 @@ replaceProperties () {
   replaceProperty $1 DOCKER_IMAGE
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
+  replaceProperty $1 UNLEASH_WORKFLOW_URL
 }
 
 replaceProperty () {
@@ -819,6 +826,7 @@ defaultValues () {
   INCREMENT_POLICY=$DEFAULT_INCREMENT_POLICY
   MAVEN_RELEASER=$DEFAULT_MAVEN_RELEASER
   MODE_SCRIPT_CONTENT=$DEFAULT_MODE_SCRIPT_CONTENT
+  UNLEASH_WORKFLOW_URL=
 }
 
 displayBanner () {
