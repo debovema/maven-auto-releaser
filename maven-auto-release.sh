@@ -558,7 +558,7 @@ executeRelease () {
   case "$MAVEN_RELEASER" in
     "unleash")
       echo " Executing release build using unleash-maven-plugin releaser."
-      if [ -z "$UNLEASH_WORKFLOW_URL" ]; then
+      if [ "$UNLEASH_WORKFLOW_URL" != "" ]; then
         curl -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
         WORKFLOW_PARAM=/tmp/unleash-workflow
       else
