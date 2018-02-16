@@ -485,7 +485,7 @@ createTriggerTag () {
   echo "9. Cleaning the release.properties file"
 
   # switch back to the temporary branch
-  git checkout $RELEASE_TRIGGER_BRANCH
+  git checkout -q $RELEASE_TRIGGER_BRANCH
   if [ $? -gt 0 ]; then
     echo
     echo " Unable to checkout to $RELEASE_TRIGGER_BRANCH branch"
@@ -554,6 +554,8 @@ executeRelease () {
 
   # source release.properties
   [ -f ./release.properties ] && source ./release.properties
+
+  cat ./release.properties
 
   case "$MAVEN_RELEASER" in
     "unleash")
