@@ -533,6 +533,9 @@ prepareRelease () {
   # source release.properties
   [ -f ./release.properties ] && source ./release.properties
 
+  cat ./release.properties
+  echo "$UNLEASH_WORKFLOW_URL"
+
   SSH_GIT_URL=$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')
   git remote set-url origin ssh://$SSH_GIT_URL
 
