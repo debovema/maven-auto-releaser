@@ -561,7 +561,7 @@ executeRelease () {
       echo "$UNLEASH_WORKFLOW_URL"
       if [ "$UNLEASH_WORKFLOW_URL" != "" ]; then
         curl -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
-        WORKFLOW_PARAM=/tmp/unleash-workflow
+        WORKFLOW_PARAM="-Dworkflow=/tmp/unleash-workflow"
       else
         WORKFLOW_PARAM=
       fi
