@@ -17,7 +17,7 @@ The main idea behind the *release trigger branch* concept is to create a Git bra
 
 This branch will be composed of:
 * a Continuous Integration configuration file (for Gitlab CI, it's the *.gitlab-ci.yml*). In this file, a trigger is set to be executed **whenever a commit is pushed on the _release trigger branch_**.
-* a *release.properties* file with information for the next version to be released.
+* a *release.properties* file with information on the next version to be released.
 * an execution script, *release.sh*, called by the Continuous Integration trigger. It will execute the actual release Maven build.
 * a *README.md* file with built-in help to guide end-users in the release process of their Maven projects
 
@@ -39,29 +39,29 @@ There are two properties file used by the **Maven auto releaser**: *branch.prope
 
 #### List of supported properties in *release.properties*
 
-| Property                 | Description                                                 | Example            |
-|--------------------------|-------------------------------------------------------------|--------------------|
-| DEV\_VERSION             | The next development version                                | 1.0.2-SNAPSHOT     |
-| RELEASE\_VERSION         | The next release version                                    | 1.0.1              |
-|                          |                                                             |                    |
-| GIT\_USER\_EMAIL         | Value of git config user.email                              | john.doe@gmail.com |
-| GIT\_USER\_NAME          | Value of git config user.name                               | "John Doe"         |
-| INCREMENT\_POLICY        | The increment policy. Values can be: revision, minor, major | revision           |
-| RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases         | release-trigger    |
-| SOURCE\_BRANCH           | The branch to checkout to initiate releases                 | master             |
+| Property                 | Description                                                                                            | Example (is default?) |
+|--------------------------|--------------------------------------------------------------------------------------------------------|-----------------------|
+| DEV\_VERSION             | The next development version                                                                           | 1.0.2-SNAPSHOT        |
+| RELEASE\_VERSION         | The next release version                                                                               | 1.0.1                 |
+|                          |                                                                                                        |                       |
+| GIT\_USER\_EMAIL         | Value of git config user.email                                                                         | john.doe@gmail.com    |
+| GIT\_USER\_NAME          | Value of git config user.name                                                                          | "John Doe"            |
+| INCREMENT\_POLICY        | The increment policy. Values can be: revision, minor, major                                            | revision (yes)        |
+| MAVEN\_RELEASER          | The Maven plugin used to release<br />Values can be: maven, unleash                                    | unleash (yes)         |
+| RELEASE\_TRIGGER\_BRANCH | The release trigger branch which initiates releases                                                    | release-trigger (yes) |
+| SOURCE\_BRANCH           | The branch to checkout to initiate releases                                                            | master (yes)          |
+| UNLEASH\_WORKFLOW\_URL   | (optional, if MAVEN\_RELEASER == unleash) an URL to fetch the Maven unleash plugin workflow at runtime |                       |
 
 #### List of supported properties in *branch.properties*
 
 All properties of *release.properties* file can be set in *branch.properties* (except DEV\_VERSION and RELEASE\_VERSION).
 They will be forwarded to the *release.properties* during *release trigger branch* creation.
-In addition, these properties are also available specifically:
+In addition, these properties are also available specifically in creation step:
 
-| Property                 | Description                                                                                             | Default value       |
-|--------------------------|---------------------------------------------------------------------------------------------------------|---------------------|
-| DOCKER\_IMAGE            | The Docker image for Gitlab CI builds to be set in *release.properties*                                 | debovema/docker-mvn |
-| MAVEN\_RELEASER          | The Maven plugin used to release to be set in *release.properties*. <br />Values can be: maven, unleash | unleash             |
-| UNLEASH\_WORKFLOW\_URL   | (optional, if MAVEN\_RELEASER == unleash) an URL to fetch the Maven unleash plugin workflow at runtime  |                     |
-| MODE\_SCRIPT\_CONTENT    | The mode for script content. <br />Values can be: remote, local                                         | remote              |
+| Property                 | Description                                                         | Default value       |
+|--------------------------|---------------------------------------------------------------------|---------------------|
+| DOCKER\_IMAGE            | The Docker image for Gitlab CI builds to be set in *.gitlab-ci.yml* | debovema/docker-mvn |
+| MODE\_SCRIPT\_CONTENT    | The mode for script content. <br />Values can be: remote, local     | remote              |
 
 ### Supported **Continuous Integration** backends
 
