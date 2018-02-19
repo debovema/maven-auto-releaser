@@ -769,6 +769,7 @@ replaceProperties () {
   replaceProperty $1 DOCKER_IMAGE
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
+  replaceProperty $1 MAVEN_RELEASER
   replaceProperty $1 UNLEASH_WORKFLOW_URL
 }
 
