@@ -3,8 +3,8 @@
 # maven-auto-releaser.sh
 # released by Mathieu Debove (https://github.com/debovema) under Apache License, Version 2.0
 
-MAVEN_AUTO_RELEASER_VERSION=1.1.0 # this is the displayed version (in banner)
-MAVEN_AUTO_RELEASER_VERSION_TAG=v$MAVEN_AUTO_RELEASER_VERSION #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
+MAVEN_AUTO_RELEASER_VERSION=1.2.0 # this is the displayed version (in banner)
+MAVEN_AUTO_RELEASER_VERSION_TAG=master # v$MAVEN_AUTO_RELEASER_VERSION #v$MAVEN_AUTO_RELEASER_VERSION # this is the Git tag used to retrieve template files
 
 DEFAULT_RELEASE_TRIGGER_BRANCH=release-trigger
 DEFAULT_SOURCE_BRANCH=master
