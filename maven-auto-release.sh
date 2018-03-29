@@ -11,10 +11,10 @@ DEFAULT_SOURCE_BRANCH=master
 DEFAULT_DOCKER_IMAGE=debovema/docker-mvn
 DEFAULT_GIT_USER_NAME="Auto Releaser"
 DEFAULT_GIT_USER_EMAIL="auto@release.io"
+DEFAULT_GIT_SSH_PORT=
 DEFAULT_INCREMENT_POLICY=revision
 DEFAULT_MAVEN_RELEASER=unleash
 DEFAULT_MODE_SCRIPT_CONTENT=remote
-DEFAULT_SSH_PORT=
 
 ### release trigger branch creation ###
 
@@ -351,10 +351,10 @@ initCI () {
 #
 # arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
 createTriggerTag () {
-  if [ "$SSH_PORT" != "" ]; then
-    SSH_PORT=":$SSH_PORT"
+  if [ "$GIT_SSH_PORT" != "" ]; then
+    GIT_SSH_PORT=":$GIT_SSH_PORT"
   fi
-  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://\2$SSH_PORT/\3|")
+  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://\2$GIT_SSH_PORT/\3|")
 
   defaultValues
 
@@ -770,12 +770,12 @@ replaceProperties () {
   replaceProperty $1 INCREMENT_POLICY
   replaceProperty $1 GIT_USER_NAME
   replaceProperty $1 GIT_USER_EMAIL
+  replaceProperty $1 GIT_SSH_PORT
   replaceProperty $1 DOCKER_IMAGE
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION_TAG
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
   replaceProperty $1 MAVEN_RELEASER
   replaceProperty $1 UNLEASH_WORKFLOW_URL
-  replaceProperty $1 SSH_PORT
 }
 
 replaceProperty () {
@@ -831,12 +831,12 @@ defaultValues () {
   RELEASE_TRIGGER_BRANCH=$DEFAULT_RELEASE_TRIGGER_BRANCH
   GIT_USER_NAME=$DEFAULT_GIT_USER_NAME
   GIT_USER_EMAIL=$DEFAULT_GIT_USER_EMAIL
+  GIT_SSH_PORT=$DEFAULT_GIT_SSH_PORT
   DOCKER_IMAGE=$DEFAULT_DOCKER_IMAGE 
   INCREMENT_POLICY=$DEFAULT_INCREMENT_POLICY
   MAVEN_RELEASER=$DEFAULT_MAVEN_RELEASER
   MODE_SCRIPT_CONTENT=$DEFAULT_MODE_SCRIPT_CONTENT
   UNLEASH_WORKFLOW_URL=
-  SSH_PORT=$DEFAULT_SSH_PORT
 }
 
 displayBanner () {
