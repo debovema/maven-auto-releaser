@@ -351,14 +351,14 @@ initCI () {
 #
 # arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
 createTriggerTag () {
+  defaultValues
+
+  [ -f ./release.properties ] && source ./release.properties
+
   if [ "$GIT_SSH_PORT" != "" ]; then
     GIT_SSH_PORT=":$GIT_SSH_PORT"
   fi
   GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://\2$GIT_SSH_PORT/\3|")
-
-  defaultValues
-
-  [ -f ./release.properties ] && source ./release.properties
 
   # get SHA of the latest commit of the source branch
   RELEASE_COMMIT_SHA=$(git rev-parse $SOURCE_BRANCH)
