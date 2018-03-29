@@ -14,6 +14,7 @@ DEFAULT_GIT_USER_EMAIL="auto@release.io"
 DEFAULT_INCREMENT_POLICY=revision
 DEFAULT_MAVEN_RELEASER=unleash
 DEFAULT_MODE_SCRIPT_CONTENT=remote
+DEFAULT_SSH_PORT=
 
 ### release trigger branch creation ###
 
@@ -350,7 +351,10 @@ initCI () {
 #
 # arguments are provided by a KEY=VALUE file named release.properties in the same directory of this script
 createTriggerTag () {
-  GIT_REPOSITORY_URL="ssh://$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')"
+  if [ "$SSH_PORT" != "" ]; then
+    SSH_PORT=":$SSH_PORT"
+  fi
+  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://\2$SSH_PORT/\3|")
 
   defaultValues
 
@@ -771,6 +775,7 @@ replaceProperties () {
   replaceProperty $1 MAVEN_AUTO_RELEASER_VERSION
   replaceProperty $1 MAVEN_RELEASER
   replaceProperty $1 UNLEASH_WORKFLOW_URL
+  replaceProperty $1 SSH_PORT
 }
 
 replaceProperty () {
@@ -831,6 +836,7 @@ defaultValues () {
   MAVEN_RELEASER=$DEFAULT_MAVEN_RELEASER
   MODE_SCRIPT_CONTENT=$DEFAULT_MODE_SCRIPT_CONTENT
   UNLEASH_WORKFLOW_URL=
+  SSH_PORT=$DEFAULT_SSH_PORT
 }
 
 displayBanner () {
