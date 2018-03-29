@@ -358,7 +358,7 @@ createTriggerTag () {
   if [ "$GIT_SSH_PORT" != "" ]; then
     GIT_SSH_PORT=":$GIT_SSH_PORT"
   fi
-  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://\2$GIT_SSH_PORT/\3|")
+  GIT_REPOSITORY_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://git@\2$GIT_SSH_PORT/\3|")
 
   # get SHA of the latest commit of the source branch
   RELEASE_COMMIT_SHA=$(git rev-parse $SOURCE_BRANCH)
@@ -539,8 +539,12 @@ prepareRelease () {
 
   cp ./release.properties /tmp/release.properties
 
-  SSH_GIT_URL=$(git config --get remote.origin.url | sed 's|https\?://gitlab-ci-token:.*@\(.*\)|git@\1|')
-  git remote set-url origin ssh://$SSH_GIT_URL
+  if [ "$GIT_SSH_PORT" != "" ]; then
+    GIT_SSH_PORT=":$GIT_SSH_PORT"
+  fi
+  SSH_GIT_URL=$(git config --get remote.origin.url | sed --regexp-extended "s|https?://([^@]*@)?([^/]*)/(.*)|ssh://git@\2$GIT_SSH_PORT/\3|")
+
+  git remote set-url origin $SSH_GIT_URL
 
   # configure repository and checkout $SOURCE_BRANCH instead of current release branch
   git config user.name $GIT_USER_NAME
