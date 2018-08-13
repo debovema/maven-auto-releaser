@@ -578,7 +578,7 @@ executeRelease () {
         echo "Downloading workflow from $UNLEASH_WORKFLOW_URL..."
 	DOWNLOAD_HEADER=
 	if [ ! -z "$GITLAB_PRIVATE_TOKEN" ]; then
-          curl --header 'PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN' -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
+          curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
 	else
 	  curl $DOWNLOAD_HEADER -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
 	fi
