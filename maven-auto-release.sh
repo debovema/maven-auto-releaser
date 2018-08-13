@@ -560,6 +560,11 @@ prepareRelease () {
 }
 
 executeRelease () {
+  unset GITLAB_PRIVATE_TOKEN
+  if [ "$#" -eq 1 ]; then
+    GITLAB_PRIVATE_TOKEN=$1
+  fi
+
   defaultValues
 
   # source release.properties
@@ -571,7 +576,11 @@ executeRelease () {
 
       if [ "$UNLEASH_WORKFLOW_URL" != "" ]; then
         echo "Downloading workflow from $UNLEASH_WORKFLOW_URL..."
-        curl -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
+	DOWNLOAD_HEADER=
+	if [ ! -z "$GITLAB_PRIVATE_TOKEN" ]; then
+	  DOWNLOAD_HEADER="--header 'PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN'"
+	fi
+        curl $DOWNLOAD_HEADER -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
 	cat /tmp/unleash-workflow
         WORKFLOW_PARAM="-Dworkflow=/tmp/unleash-workflow"
       else
