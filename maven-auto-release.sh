@@ -570,7 +570,9 @@ executeRelease () {
       echo " Executing release build using unleash-maven-plugin releaser."
 
       if [ "$UNLEASH_WORKFLOW_URL" != "" ]; then
+        echo "Downloading workflow from $UNLEASH_WORKFLOW_URL..."
         curl -fsSL $UNLEASH_WORKFLOW_URL -o /tmp/unleash-workflow
+	cat /tmp/unleash-workflow
         WORKFLOW_PARAM="-Dworkflow=/tmp/unleash-workflow"
       else
         WORKFLOW_PARAM=
