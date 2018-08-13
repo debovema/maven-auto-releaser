@@ -25,6 +25,6 @@ release:
     # call prepareRelease from maven-auto-releaser script
     - prepareRelease
     # call executeRelease from maven-auto-releaser script
-    - executeRelease
+    - executeRelease $GITLAB_PRIVATE_TOKEN
   only:
     - tags
